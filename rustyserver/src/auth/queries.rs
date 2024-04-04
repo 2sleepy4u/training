@@ -6,6 +6,7 @@ pub const NEW_SESSION_QUERY: &str = "
 
 pub const CHECK_SESSION: &str = "
    SELECT
+        S.id_user,
         S.SSID
     FROM 
         Sessions S LEFT JOIN LATERAL

@@ -39,7 +39,8 @@ pub async fn get_new_session(
         if let Ok(Some(row)) = result {
             row
         } else {
-            panic!("No user found or wrong credential");
+            error!("No user found or wrong credential");
+            return Status::Unauthorized
         };
 
     let token = 
@@ -54,7 +55,8 @@ pub async fn get_new_session(
                 .await;
 
             if let Err(e) = result {
-                panic!("Errore nella creazione della nuova sessione: {}", e);
+                error!("Errore nella creazione della nuova sessione: {}", e);
+                return Status::Unauthorized
             };
             token
         };
