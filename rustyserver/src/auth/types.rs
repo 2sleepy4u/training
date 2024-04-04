@@ -13,13 +13,11 @@ pub struct UserCredentials {
     pub password: String
 }
 
-#[derive(Serialize)]
-#[serde(crate = "rocket::serde")]
-struct Token {
-    token: String
+#[derive(sqlx::FromRow)]
+pub struct isAuth {
+    pub token: String,
+    pub id_user: i32
 }
-
-pub struct isAuth(pub String);
 
 #[derive(Debug)]
 pub enum AuthStatus {
@@ -33,40 +31,27 @@ impl<'r> FromRequest<'r> for isAuth {
     type Error = AuthStatus;
 
     async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
+        let ssid: &str = req.cookies().get("SSID")
+            .map_or("", |cookie| cookie.value());
 
-        async fn is_valid(mut db: Connection<Training>, ssid: &str) -> bool {
-            if ssid.is_empty() {
-                return false;
-            }
-
-           let row = sqlx::query(CHECK_USER_QUERY)
-                .bind(ssid)
-                .fetch_optional(&mut **db)
-                .await;
-           let result =
-               if let Ok(Some(row)) = row {
-                   let t: Result<String, _> = row.try_get("SSID");
-                   t.is_ok()
-               } else {
-                   false
-               };
-
-            result
+        if ssid.is_empty() {
+            return Outcome::Error((Status::Unauthorized, AuthStatus::Unauthorized));
         }
-
-        let ssid: &str = match req.cookies().get("SSID") {
-            Some(cookie) => cookie.value(),
-            None =>  ""
-        };
-        let db: Connection<Training> = match req.guard::<Connection<Training>>().await {
+        let mut db: Connection<Training> = match req.guard::<Connection<Training>>().await {
             rocket::outcome::Outcome::Success(a) => a,
             _ => panic!("Cannot retrive Connection Pool to Training dataBase from authentication middleware")
         };
 
-        if is_valid(db, ssid).await {
-            Outcome::Success(isAuth(ssid.to_string()))
+        let row = sqlx::query_as::<_, isAuth>(CHECK_SESSION)
+            .bind(ssid)
+            .fetch_optional(&mut **db)
+            .await;
+
+        if let Ok(Some(is_auth)) = row {
+            Outcome::Success(is_auth)
         } else {
             Outcome::Error((Status::Unauthorized, AuthStatus::Unauthorized))
         }
+
     }
 }

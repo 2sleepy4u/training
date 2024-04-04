@@ -5,7 +5,9 @@ use rocket::http::{Cookie, Header};
 use rocket_db_pools::Database;
 
 mod auth;
+mod exercises;
 use auth::routes::*;
+use exercises::*;
 
 
 #[options("/<_..>")]
@@ -32,24 +34,12 @@ fn rocket() -> _ {
         .attach(Training::init())
         .mount("/", routes![
                request_roll_preflight,
-               get_new_session
+               get_new_session,
+               insert_plan,
+               insert_execution,
+               get_daily
         ])
         .register("/", catchers![unauthorized])
             
 }
 
-/*
- #[derive(Database)]
-#[database("m2m")]
-struct M2M(sqlx::MySqlPool);
-
-
-
-#[get("/get_new_session")]
-async fn get_new_session(mut db: Connection<M2M>) -> Option<String> {
-    sqlx::query("SELECT 'ciao' as testo")
-        .fetch_one(&mut **db).await
-        .and_then(|r| Ok(r.try_get("testo")?))
-        .ok()
-}
-*/
