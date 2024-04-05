@@ -7,22 +7,36 @@
 
 </script>
 
-<div id = "exerciseList" >
+<div id="container">
     <h2>Today is {data.weekday}</h2>
-    {#each data.exercises as row}
-        <ExerciseCard 
-            name = {row.name}
-            isDone = {row.isDone}
-            description = {row.description}
-            on:click = {() => { goto("/app/detail", {state: row}) } }
-        />
-    {/each}
+    <div id = "exerciseList" >
+        {#each data.exercises as row}
+            <ExerciseCard 
+                name = {row.name}
+                isDone = {row.is_done}
+                description = {row.description}
+                on:click = {() => { goto("/app/detail", {state: row}) } }
+            />
+        {/each}
+    </div>
 </div>
 
 <style>
-    #exerciseList {
+    #container {
+            height: calc(100% - 15px);
+            display: flex;
+            flex-flow: column;
+        }
+    h2, #exerciseList {
         text-align: center;
     }
+    h2 {
+            flex: 0 1;
+        }
+    #exerciseList {
+            overflow: scroll;
+            flex: 1 1;
+        }
 </style>
 
 

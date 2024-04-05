@@ -1,13 +1,18 @@
-/** @type {import('./$types').PageLoad} */
-export function load() {
-    //TODO fetch data from webserver
-    /*
-    try {
-        return await fetch("/get_daily")
-    } catch(e) {
+import { getPostFetchOptions } from '$lib'
 
+/** @type {import('./$types').PageLoad} */
+export async function load() {
+    //TODO fetch data from webserver
+
+    try {
+        return await fetch("http://192.168.0.149:8080/get_daily", getPostFetchOptions()) 
+            .then(res => res.json())
+
+    } catch(e) {
+        console.error(e)
     }
-    */
+
+/*
 	return {
         weekday: "Saturday",
         exercises: [
@@ -17,4 +22,6 @@ export function load() {
             {name:"Plank", description: "Maybe add minute as param", sets: 0, reps: 0, isDone: false},
         ]
     }
+    */
+
 }
