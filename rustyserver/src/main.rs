@@ -19,13 +19,14 @@ fn unauthorized(req: &Request) -> String {
     "Ops Not Authorized".to_owned()
 }
 
+const ALLOWED_ORIGINS: &str = "http://192.168.0.149:5173";
 #[launch]
 fn rocket() -> _ {
     println!("Starting server...");
 
     rocket::build()
         .attach(AdHoc::on_response("Add CORS", |_req, response| Box::pin(async move {
-            response.set_header(Header::new("Access-Control-Allow-Origin", "*"));
+            response.set_header(Header::new("Access-Control-Allow-Origin", ALLOWED_ORIGINS));
             response.set_header(Header::new("Access-Control-Allow-Methods", "POST, GET, PATCH, OPTIONS"));
             response.set_header(Header::new("Access-Control-Allow-Headers", "*"));
             response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));

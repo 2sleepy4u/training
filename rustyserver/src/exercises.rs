@@ -35,11 +35,19 @@ pub struct Plan {
 #[derive(sqlx::FromRow, Serialize)]
 #[serde(crate = "rocket::serde")]
 pub struct Exercise {
-    name: String,
-    description: String,
-    reps: i32,
-    sets: i32,
-    weight: f32
+    pub name: String,
+    pub description: String,
+    pub reps: i32,
+    pub sets: i32,
+    pub weight: f32,
+    pub is_done: bool
+}
+
+#[derive(Serialize)]
+#[serde(crate = "rocket::serde")]
+pub struct Daily {
+    pub weekday: String,
+    pub exercises: Vec<Exercise>
 }
 
 #[post("/get_daily", format = "json")]
