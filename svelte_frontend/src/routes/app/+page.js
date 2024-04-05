@@ -1,4 +1,8 @@
 import { redirect } from '@sveltejs/kit';
-redirect(302, "/app/list")
+try {
+    redirect(302, "/app/list")
+} catch(e) {
+    console.error(e)
+}
 
 
