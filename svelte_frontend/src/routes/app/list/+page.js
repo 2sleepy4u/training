@@ -1,11 +1,11 @@
-import { getPostFetchOptions } from '$lib'
+import { endpoints, getPostFetchOptions } from '$lib'
 
 /** @type {import('./$types').PageLoad} */
 export async function load() {
     //TODO fetch data from webserver
 
     try {
-        return await fetch("http://192.168.0.149:8080/get_daily", getPostFetchOptions()) 
+        return await fetch(endpoints.get_daily, getPostFetchOptions()) 
             .then(res => res.json())
 
     } catch(e) {

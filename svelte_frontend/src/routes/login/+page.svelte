@@ -1,12 +1,14 @@
 <script>
     import { goto } from "$app/navigation";
-    import { getPostFetchOptions } from "$lib/index.js";
+    import { endpoints, getPostFetchOptions } from "$lib/index.js";
+
+    let email;
+    let password;
 
     async function Login() {
         try {
             //request SSID
-            //await fetch(endpoints.get_new_session, {method: "POST"})
-            await fetch("http://192.168.0.149:8080/test", getPostFetchOptions())
+            await fetch(endpoints.get_new_session, getPostFetchOptions({email, password}))
             //refresh page, if SSID is valid then it will redirect to daily list
             goto("/")
         } catch(e) { 
@@ -17,8 +19,8 @@
 </script>
 
 <div id="loginForm">
-    <input placeholder="email" type="email">
-    <input placeholder="password" type="password">
+    <input placeholder="email" type="email" bind:value={email}>
+    <input placeholder="password" type="password" bind:value={password}>
     <button on:click={Login}>Log In</button>
 </div>
 

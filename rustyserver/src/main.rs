@@ -3,12 +3,18 @@ use rocket::Request;
 use rocket::fairing::AdHoc;
 use rocket::http::{Cookie, Header};
 use rocket_db_pools::Database;
+use rocket::fs::{FileServer, relative};
 
 mod auth;
 mod exercises;
 use auth::routes::*;
 use exercises::*;
 
+
+#[get("/ping")]
+fn ping() -> String {
+    "pong".to_string()
+}
 
 #[options("/<_..>")]
 fn request_roll_preflight() {}
@@ -33,12 +39,14 @@ fn rocket() -> _ {
         })))
         .attach(Training::init())
         .mount("/", routes![
+               ping,
                request_roll_preflight,
                get_new_session,
                insert_plan,
                insert_execution,
                get_daily
         ])
+        .mount("/", FileServer::from(relative!("build/")))
         .register("/", catchers![unauthorized])
             
 }

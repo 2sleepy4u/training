@@ -56,7 +56,7 @@ pub async fn get_daily(
     mut db: Connection<Training>
 ) -> Result<Json<Vec<Exercise>>, Status> {
     let result = sqlx::query_as::<_, Exercise>(GET_DAILY)
-        .bind(&auth.token)
+        .bind(&auth.ssid)
         .fetch_all(&mut **db)
         .await;
 
@@ -75,7 +75,7 @@ pub async fn get_plan_list(
     mut db: Connection<Training>
 ) -> Result<Json<Vec<Exercise>>, Status> {
     let result = sqlx::query_as::<_, Exercise>(GET_LIST)
-        .bind(&auth.token)
+        .bind(&auth.ssid)
         .fetch_all(&mut **db)
         .await;
 
@@ -105,7 +105,7 @@ pub async fn update_plan(
         .bind(&payload.weight_step)
         .bind(&payload.weekday)
         .bind(&payload.active)
-        .bind(&auth.token)
+        .bind(&auth.ssid)
         .execute(&mut **db)
         .await;
 
@@ -133,7 +133,7 @@ pub async fn insert_plan(
         .bind(&payload.min_weight)
         .bind(&payload.weight_step)
         .bind(&payload.weekday)
-        .bind(&auth.token)
+        .bind(&auth.ssid)
         .execute(&mut **db)
         .await;
 
@@ -156,7 +156,7 @@ pub async fn insert_execution (
         .bind(&payload.reps)
         .bind(&payload.weight)
         .bind(&payload.note)
-        .bind(&auth.token)
+        .bind(&auth.ssid)
         .execute(&mut **db)
         .await
         .map_or_else(

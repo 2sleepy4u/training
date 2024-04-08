@@ -2,6 +2,7 @@ use rocket_db_pools::{sqlx::Row, Connection};
 use rocket::request::{FromRequest, Outcome, Request};
 use rocket::http::Status;
 use rocket::serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 use super::queries::*;
 use super::routes::*;
@@ -15,8 +16,8 @@ pub struct UserCredentials {
 
 #[derive(sqlx::FromRow)]
 pub struct isAuth {
-    pub token: String,
-    pub id_user: i32
+    pub id_user: i32,
+    pub ssid: Uuid
 }
 
 #[derive(Debug)]

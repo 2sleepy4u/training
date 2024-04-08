@@ -11,7 +11,7 @@ use super::queries::*;
 #[derive(sqlx::FromRow)]
 struct User {
     id_user: i32,
-    ssid: Option<String>
+    ssid: Option<Uuid>
 }
 
 #[derive(Database)]
@@ -47,7 +47,7 @@ pub async fn get_new_session(
         if let Some(ssid) = user.ssid {
             ssid
         } else {
-            let token = Uuid::new_v4().to_string();
+            let token = Uuid::new_v4();
             let result = sqlx::query(NEW_SESSION_QUERY)
                 .bind(&token)
                 .bind(user.id_user)
@@ -60,9 +60,8 @@ pub async fn get_new_session(
             };
             token
         };
-    let ssid = Cookie::build(("SSID", token))
-        .http_only(true);
-
+    let ssid = Cookie::build(("SSID", token.to_string()))
+        .path("/");
     cookies.add(ssid);
 
     Status::Ok

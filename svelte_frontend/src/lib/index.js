@@ -27,6 +27,9 @@ export function getPostFetchOptions(data) {
         method: "POST",
         mode: "cors",
         credentials: "include",
+        headers: {
+            "Content-Type": "application/json"
+        }
     }
 
     if(data != null)
@@ -35,8 +38,9 @@ export function getPostFetchOptions(data) {
 
 }
 
-const webServer = "http://192.168.1.41"
-const port = "8080"
+//const webServer = "http://192.168.1.41"
+const webServer = "http://192.168.0.149"
+const port = ":8080"
 export const endpoints = {
     get_new_session: webServer+port+"/get_new_session",
     insert_execution: webServer+port+"/insert_execution",
