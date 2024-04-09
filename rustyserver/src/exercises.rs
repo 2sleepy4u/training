@@ -2,8 +2,9 @@ use rocket::http::Status;
 use rocket::serde::json::Json;
 use rocket_db_pools::Connection;
 use rocket_db_pools::sqlx::{self, Row};
-
 use rocket::serde::{Deserialize, Serialize};
+
+use chrono::Datelike;
 use crate::auth::routes::Training;
 use crate::auth::types::isAuth;
 
@@ -17,7 +18,7 @@ pub struct Execution {
 }
 
 
-#[derive(Deserialize)]
+#[derive(sqlx::FromRow, Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
 pub struct Plan {
     pub name: String,
@@ -54,14 +55,19 @@ pub struct Daily {
 pub async fn get_daily(
     auth: isAuth,
     mut db: Connection<Training>
-) -> Result<Json<Vec<Exercise>>, Status> {
+) -> Result<Json<Daily>, Status> {
     let result = sqlx::query_as::<_, Exercise>(GET_DAILY)
         .bind(&auth.ssid)
         .fetch_all(&mut **db)
         .await;
 
     match result {
-        Ok(result) => Result::Ok(Json(result)),
+        Ok(exercises) => {
+            let current_time = chrono::offset::Local::now();
+            let weekday = current_time.date_naive().weekday().to_string();
+            let daily = Daily { weekday, exercises};
+            Result::Ok(Json(daily))
+        },
         Err(e) =>  {
             error!("Error while retriving daily exercises: {}", e);
             Result::Err(Status::InternalServerError)
@@ -73,8 +79,8 @@ pub async fn get_daily(
 pub async fn get_plan_list(
     auth: isAuth,
     mut db: Connection<Training>
-) -> Result<Json<Vec<Exercise>>, Status> {
-    let result = sqlx::query_as::<_, Exercise>(GET_LIST)
+) -> Result<Json<Vec<Plan>>, Status> {
+    let result = sqlx::query_as::<_, Plan>(GET_LIST)
         .bind(&auth.ssid)
         .fetch_all(&mut **db)
         .await;
@@ -190,7 +196,32 @@ pub const UPDATE_PLAN: &str = "
         id_user = $10 AND name = $11
 
 ";
-pub const GET_DAILY: &str = "";
-pub const GET_LIST: &str = "";
-pub const INSERT_EXECUTION: &str = "";
+pub const GET_DAILY: &str = "
+    SELECT 
+      EP.name,
+      EP.description,
+      EL.reps,
+      EL.sets,
+      EL.weight,
+      EL.minutes
+    FROM
+      ExercisePlan EP INNER JOIN
+      Sessions S ON S.id_user = EP.id_user LEFT JOIN LATERAL
+      get_exercise_level(EP.id_exercise_plan) EL ON true
+    WHERE
+      S.SSID = $1
+      EP.weekday = TRIM(To_Char(CURRENT_DATE, 'Day'))::Weekday
+";
+pub const GET_LIST: &str = "
+    SE
+";
+pub const INSERT_EXECUTION: &str = "
+    INSERT INTO ExerciseExecution 
+        (id_exercise_plan, id_user, sets, reps, weight, execution_date) VALUES
+        (P.id_exercise_plan, $1, $2, $3, $4, CURRENT_DATE)
+    FROM 
+        ExercisePlan P 
+    WHERE 
+        P.name = $5
+";
 
