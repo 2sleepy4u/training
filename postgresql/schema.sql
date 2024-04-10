@@ -135,6 +135,7 @@ BEGIN
     ExerciseRow ER ON ER.id_exercise_execution = EE.id_exercise_execution
   WHERE
     EP.id_exercise_plan = input_id_plan
+    AND EE.execution_date < CURRENT_DATE
   GROUP BY EE.id_exercise_execution
   ORDER BY 
     EE.execution_date DESC
@@ -191,6 +192,7 @@ BEGIN
     ExerciseRow ER ON ER.id_exercise_execution = EE.id_exercise_execution
   WHERE
     EP.id_exercise_plan = input_id_plan
+    AND EE.execution_date < CURRENT_DATE
   ORDER BY 
     EE.execution_date
   LIMIT 1;

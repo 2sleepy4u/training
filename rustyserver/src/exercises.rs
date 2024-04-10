@@ -13,7 +13,8 @@ use crate::auth::types::isAuth;
 pub struct Execution {
     pub id_plan: i32,
     pub reps: Vec<i32>,
-    pub weight: f32,
+    //pub weight: f32,
+    pub weight: i32,
     pub note: String
 }
 
@@ -28,7 +29,8 @@ pub struct Plan {
     pub min_sets: i32,
     pub max_sets: i32,
     pub min_weight: i32,
-    pub weight_step: f32,
+    //pub weight_step: f32,
+    pub weight_step: i32,
     pub weekday: String,
     pub active: bool
 }
@@ -36,12 +38,16 @@ pub struct Plan {
 #[derive(sqlx::FromRow, Serialize)]
 #[serde(crate = "rocket::serde")]
 pub struct Exercise {
+    pub id_plan: i32,
     pub name: String,
     pub description: String,
     pub reps: i32,
     pub sets: i32,
-    pub weight: f32,
-    pub is_done: bool
+    //pub weight: f32,
+    pub weight: i32,
+    pub is_done: bool,
+    pub done_reps: Vec<i32>,
+    pub note: String,  
 }
 
 #[derive(Serialize)]
@@ -51,7 +57,22 @@ pub struct Daily {
     pub exercises: Vec<Exercise>
 }
 
-#[post("/get_daily", format = "json")]
+fn get_current_weekday() -> String {
+    let current_time = chrono::offset::Local::now();
+    let weekday = current_time.date_naive().weekday();
+    let weekday = match weekday {
+        chrono::Weekday::Sun => "Sunday",
+        chrono::Weekday::Mon => "Monday",
+        chrono::Weekday::Tue => "Tuesday",
+        chrono::Weekday::Wed => "Wednesday",
+        chrono::Weekday::Thu => "Thursday",
+        chrono::Weekday::Fri => "Friday",
+        chrono::Weekday::Sat => "Saturday",
+    };
+    weekday.to_string()
+}
+
+#[get("/get_daily", format = "json")]
 pub async fn get_daily(
     auth: isAuth,
     mut db: Connection<Training>
@@ -63,8 +84,7 @@ pub async fn get_daily(
 
     match result {
         Ok(exercises) => {
-            let current_time = chrono::offset::Local::now();
-            let weekday = current_time.date_naive().weekday().to_string();
+            let weekday = get_current_weekday();
             let daily = Daily { weekday, exercises};
             Result::Ok(Json(daily))
         },
@@ -198,22 +218,39 @@ pub const UPDATE_PLAN: &str = "
 ";
 pub const GET_DAILY: &str = "
     SELECT 
+      EP.id_exercise_plan AS id_plan,
       EP.name,
       EP.description,
-      EL.reps,
-      EL.sets,
-      EL.weight,
-      EL.minutes
+      COALESCE(EL.reps, EP.min_reps) AS reps,
+      COALESCE(EL.sets, EP.min_sets) AS sets,
+      COALESCE(EL.weight, EP.min_weight) AS weight,
+      COALESCE(EL.minutes, 0) AS minutes,
+      EXISTS ( 
+          SELECT *
+          FROM ExerciseExecution EE
+          WHERE EE.execution_date = CURRENT_DATE
+          AND EE.id_exercise_plan = EP.id_exercise_plan
+      ) AS is_done,
+      ARRAY(
+          SELECT 
+            ER.reps
+          FROM 
+            ExerciseExecution EE INNER JOIN
+            ExerciseRow ER ON EE.id_exercise_execution = ER.id_exercise_execution
+          WHERE 
+            EE.execution_date = CURRENT_DATE
+          AND EE.id_exercise_plan = EP.id_exercise_plan
+      ) AS done_reps
     FROM
       ExercisePlan EP INNER JOIN
       Sessions S ON S.id_user = EP.id_user LEFT JOIN LATERAL
-      get_exercise_level(EP.id_exercise_plan) EL ON true
+      get_exercise_level(EP.id_exercise_plan) EL ON true 
     WHERE
       S.SSID = $1
-      EP.weekday = TRIM(To_Char(CURRENT_DATE, 'Day'))::Weekday
 ";
+//    AND EP.weekday = TRIM(To_Char(CURRENT_DATE, 'Day'))::Weekday
+
 pub const GET_LIST: &str = "
-    SE
 ";
 pub const INSERT_EXECUTION: &str = "
     INSERT INTO ExerciseExecution 

@@ -1,0 +1,80 @@
+.exerciseElement {
+    border: 1px solid black;
+    border-radius: 15px;
+    height: 50px;
+
+    padding: 10px;
+    margin: 10px;
+
+    text-align: center;
+    background-color: #131518;
+}
+
+.dailyContainer {
+    overflow: scroll;
+    flex: 1 1;
+    height: calc(100% - 15px);
+    display: flex;
+    flex-flow: column;
+}
+
+h2, .dailyContainer {
+    text-align: center;
+}
+
+h2 {
+    flex: 0 1;
+}
+
+.is_done {
+    background-color: #2e7d32;
+}
+
+html, body {
+    height: 100%;
+    color: #E4E4E4;
+    background-color: #212121;
+    overflow: hidden;
+}
+
+.repContainer * {
+    display: inline;
+}
+
+.setContainer {
+}
+
+.detailContainer input {
+    width: 30px;
+    font-size: inherit;
+    background-color: inherit;
+    border: none;
+    border-bottom: 1px solid;
+    color:inherit;
+}
+
+.detailContainer {
+    text-align: center;
+    margin: 5px;
+}
+
+.detailContainer * {
+    margin-top: 15px;
+}
+
+.detailContainer textarea {
+    min-height: 100px;
+    width: 100%;
+    background-color: inherit;
+    color:inherit;
+}
+.detailContainer button {
+    height: 50px;
+    width: 50%;
+
+    border: 1px solid;
+    border-radius: 15px;
+    color:inherit;
+    background-color: inherit;
+}
+
