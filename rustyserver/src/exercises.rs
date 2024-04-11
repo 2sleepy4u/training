@@ -78,6 +78,7 @@ pub async fn get_daily(
     mut db: Connection<Training>
 ) -> Result<Json<Daily>, Status> {
     let result = sqlx::query_as::<_, Exercise>(GET_DAILY)
+        //sqlx::query_file_as!(Exercise, "postgresql/queries/get_daily.sql", &auth.ssid)
         .bind(&auth.ssid)
         .fetch_all(&mut **db)
         .await;
@@ -175,24 +176,35 @@ pub async fn insert_plan(
 pub async fn insert_execution (
     payload: Json<Execution>, 
     mut db: Connection<Training>,
-    auth: isAuth
+    _auth: isAuth
 ) -> Status {
-    sqlx::query(INSERT_EXECUTION)
-        .bind(&payload.id_plan)
-        .bind(&payload.reps)
-        .bind(&payload.weight)
-        .bind(&payload.note)
-        .bind(&auth.ssid)
-        .execute(&mut **db)
-        .await
-        .map_or_else(
-            |e| {
-                error!("Error while registering the execution: {}", e);
-                Status::InternalServerError
-            },
-            |_| {Status::Ok}
-            )
+    let result =  
+        sqlx::query_as::<_, (i32,)>(INSERT_EXECUTION)
+            .bind(&payload.id_plan)
+            .bind(&payload.note)
+            .fetch_one(&mut **db)
+            .await;
 
+    let id = 
+        match result {
+            Ok(res) => res.0,
+            Err(e) => panic!("{}", e)
+        };
+
+        for (i, reps) in payload.reps.iter().enumerate() {
+           let result = sqlx::query(INSERT_EXECUTION_ROW)
+               .bind(id)
+               .bind(i as i32)
+               .bind(reps)
+               .bind(&payload.weight)
+               .execute(&mut **db)
+               .await;
+
+           if let Err(e) = result {
+                panic!("{}", e);
+           };
+        }
+        Status::Ok
 }
 
 pub const INSERT_PLAN: &str = "
@@ -217,7 +229,7 @@ pub const UPDATE_PLAN: &str = "
 
 ";
 pub const GET_DAILY: &str = "
-    SELECT 
+     SELECT 
       EP.id_exercise_plan AS id_plan,
       EP.name,
       EP.description,
@@ -231,7 +243,19 @@ pub const GET_DAILY: &str = "
           WHERE EE.execution_date = CURRENT_DATE
           AND EE.id_exercise_plan = EP.id_exercise_plan
       ) AS is_done,
-      ARRAY(
+      CASE
+        WHEN ARRAY_LENGTH(ARRAY(   
+            SELECT 
+              ER.reps
+            FROM 
+              ExerciseExecution EE INNER JOIN
+              ExerciseRow ER ON EE.id_exercise_execution = ER.id_exercise_execution
+            WHERE 
+              EE.execution_date = CURRENT_DATE
+            AND EE.id_exercise_plan = EP.id_exercise_plan
+        ),1) IS NULL
+        THEN ARRAY(select 0 as num from generate_series(1, COALESCE(EL.sets, EP.min_sets)))
+        ELSE ARRAY(
           SELECT 
             ER.reps
           FROM 
@@ -240,25 +264,31 @@ pub const GET_DAILY: &str = "
           WHERE 
             EE.execution_date = CURRENT_DATE
           AND EE.id_exercise_plan = EP.id_exercise_plan
-      ) AS done_reps
+      ) END AS done_reps,
+      --COALESCE(EE.note, '') AS note
+      '' AS note
     FROM
       ExercisePlan EP INNER JOIN
-      Sessions S ON S.id_user = EP.id_user LEFT JOIN LATERAL
-      get_exercise_level(EP.id_exercise_plan) EL ON true 
+      Sessions S ON S.id_user = EP.id_user LEFT JOIN
+      ExerciseExecution EE ON EE.id_exercise_plan = EP.id_exercise_plan LEFT JOIN LATERAL
+      get_exercise_level(EP.id_exercise_plan) EL ON true   
     WHERE
       S.SSID = $1
+    --AND EP.weekday = TRIM(To_Char(CURRENT_DATE, 'Day'))::Weekday
 ";
-//    AND EP.weekday = TRIM(To_Char(CURRENT_DATE, 'Day'))::Weekday
+
+pub const INSERT_EXECUTION_ROW: &str = "
+    INSERT INTO ExerciseRow
+    (id_exercise_execution, row_number, reps, weight) VALUES
+    ($1, $2, $3, $4)
+";
 
 pub const GET_LIST: &str = "
 ";
 pub const INSERT_EXECUTION: &str = "
     INSERT INTO ExerciseExecution 
-        (id_exercise_plan, id_user, sets, reps, weight, execution_date) VALUES
-        (P.id_exercise_plan, $1, $2, $3, $4, CURRENT_DATE)
-    FROM 
-        ExercisePlan P 
-    WHERE 
-        P.name = $5
+        (id_exercise_plan, note, execution_date) VALUES
+        ($1, $2, CURRENT_DATE)
+    RETURNING id_exercise_execution
 ";
 

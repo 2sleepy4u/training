@@ -1,6 +1,7 @@
 module Types exposing (..)
 import Json.Decode as JD exposing (field, Decoder, int, string, list, bool, succeed)
 import Json.Decode.Pipeline exposing (required, optional)
+import Json.Encode as JE 
 
 type alias Daily =
     { weekday: String
@@ -42,5 +43,14 @@ dailyDecoder =
 exerciseListDecoder : Decoder (List Exercise) 
 exerciseListDecoder =
   JD.list exerciseDecoder
+
+encodeExecution : Exercise -> JE.Value
+encodeExecution exercise =
+    JE.object
+        [ ( "id_plan", JE.int exercise.id_plan )
+        , ( "weight", JE.int exercise.weight)
+        , ( "note", JE.string exercise.note )
+        , ( "reps", JE.list JE.int exercise.done_reps )
+        ]
 
 

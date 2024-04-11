@@ -1,4 +1,4 @@
-default:
+build:
 	echo "Building project..."
 	echo "Starting with Elm Frontend..."
 	cd elm
@@ -10,6 +10,9 @@ default:
 	cd rustyserver
 	cargo build
 	echo "Rust webserver built."
+	cd ..
 
-
+run: build
+	cd rustyserver
+	cargo run 
 
