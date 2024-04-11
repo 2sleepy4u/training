@@ -49,7 +49,7 @@ CREATE TABLE ExercisePlan (
 
     minutes INT,
 
-    weekday Weekday,
+    weekday Weekday[7],
     active BOOLEAN,
 
     CONSTRAINT fk_id_user_exercise_plan
@@ -61,6 +61,7 @@ CREATE TABLE ExerciseExecution (
     id_exercise_execution SERIAL PRIMARY KEY,
     id_exercise_plan INT,
     execution_date TIMESTAMP,
+    note VARCHAR(255),
 
     CONSTRAINT fk_exercise_plan
         FOREIGN KEY(id_exercise_plan)
@@ -79,24 +80,6 @@ CREATE TABLE ExerciseRow (
     FOREIGN KEY(id_exercise_execution)
     REFERENCES ExerciseExecution(id_exercise_execution)
 );
-
-CREATE FUNCTION calculate_exercise_level (
-
-)
-RETURNS TABLE (
-  reps INT,
-  weight INT,
-)  
-LANGUAGE plpgsql 
-AS $$
-DECLARE
-  avg_reps INT;
-  max_weight INT;
-BEGIN
-    
-END
-$$;
-
 
 
 --Derive Level
