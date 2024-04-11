@@ -51,7 +51,7 @@ CREATE TABLE ExercisePlan (
 
     weekday Weekday[7],
     active BOOLEAN,
-
+    UNIQUE (name, active, id_user),
     CONSTRAINT fk_id_user_exercise_plan
         FOREIGN KEY(id_user)
         REFERENCES Users(id_user)
