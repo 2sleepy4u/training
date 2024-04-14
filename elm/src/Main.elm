@@ -14,18 +14,38 @@ endpoint : String
 endpoint = "http://192.168.0.194:8080"
 
 type Model 
-  = ListMode Daily
-  | DetailMode Exercise 
-  | Loading
+  --General status
+  = Loading
   | Failure String
+  --Pages
+  | ExerciseList Daily
+  | ExecutionDetail Exercise 
+  | PlanDetail ExercisePlan
+  
+
 
 type Msg
+  --Render pages
   = ViewList
   | ViewDetail Exercise
+  | ViewPlan (Maybe ExercisePlan)
+  --Http Results
   | GotExercise (Result Http.Error Daily)
-  | CreateExecution Exercise
+  --Http requests
   | InsertExecutionStatus (Result Http.Error ())
-  | RepInput Int String
+  | CreateExecution Exercise
+  --Fields Input
+  | InputRep Int String
+  | InputName String
+  | InputDescription String
+  | InputMinRep String
+  | InputMaxRep String
+  | InputMinSet String
+  | InputMaxSet String
+  | InputWeight String
+  | InputWeightStep String
+
+
 
 
 getExerciseList : Cmd Msg
@@ -73,24 +93,53 @@ init _ =
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    RepInput set value -> 
+    InputName value -> 
+        case model of
+            ViewPlan maybePlan ->
+                (model, Cmd.none)
+            _ -> 
+                (model, Cmd.none)
+    InputDescription value -> 
+        case model of
+            _ -> (model, Cmd.none)
+    InputMinRep value -> 
+        case model of
+            _ -> (model, Cmd.none)
+    InputMaxRep value -> 
+        case model of
+            _ -> (model, Cmd.none)
+    InputMinSet value -> 
+        case model of
+            _ -> (model, Cmd.none)
+    InputMaxSet value -> 
+        case model of
+            _ -> (model, Cmd.none)
+    InputWeight value -> 
+        case model of
+            _ -> (model, Cmd.none)
+    InputWeightStep value -> 
+        case model of
+            _ -> (model, Cmd.none)
+    InputRep set value -> 
         case model of 
-            DetailMode detail -> 
-                (DetailMode {detail | done_reps = Array.toList 
+            ExecutionDetail detail -> 
+                (ExecutionDetail {detail | done_reps = Array.toList 
                     <| Array.set set (String.toInt value |> Maybe.withDefault 0) (Array.fromList (detail.done_reps)) 
                 }, Cmd.none)
             _ ->
                 (model, Cmd.none)
+    ViewPlan maybePlan -> 
+        (model, Cmd.none)
     ViewList ->
         (model, getExerciseList)
     ViewDetail exercise ->
-        (DetailMode exercise, Cmd.none)
+        (ExecutionDetail exercise, Cmd.none)
     CreateExecution exercise -> 
         (model, createExecution exercise)
     GotExercise result -> 
       case result of
         Ok daily ->
-          (ListMode daily, Cmd.none)
+          (ExerciseList daily, Cmd.none)
         Err err ->
           (Failure (httpErrorDecode err), Cmd.none)
     InsertExecutionStatus result -> 
@@ -106,7 +155,7 @@ createRepContainer index detail =
     [ input 
         [ type_ "number"
         , Html.Attributes.disabled detail.is_done
-        , onInput  (RepInput index)
+        , onInput  (InputRep index)
         , value <| String.fromInt <| (Array.get index (Array.fromList detail.done_reps) |> Maybe.withDefault 0 )
         ] [] 
     , div [] [ text "/" ]
@@ -121,13 +170,27 @@ view model =
       div [ classList [ ("loading", True) ] ] [ text "Loading..." ]
     Failure err -> 
       div [ classList [ ("error", True) ] ] [ text "Error!" ]
-    ListMode daily ->
+    PlanDetail plan -> 
+        div [ classList [ ("planContainer", True) ] ] 
+            [ input [ placeholder "Name", onInput InputName ] []
+            , input [ placeholder "Description", onInput InputDescription ] []
+            , input [ placeholder "Min rep", onInput InputMinRep, type_ "number" ] []
+            , input [ placeholder "Max rep", onInput InputMaxRep, type_ "number" ] []
+            , input [ placeholder "Min set", onInput InputMinSet, type_ "number" ] []
+            , input [ placeholder "Max set", onInput InputMaxSet, type_ "number" ] []
+            , input [ placeholder "Weight", onInput InputWeight, type_ "number" ] []
+            , input [ placeholder "Weight step", onInput InputWeightStep, type_ "number" ] []
+            , button [ onClick ViewList ] [ text "Go Back" ]
+            , button [ ] [ text "Save" ]
+            ]
+    ExerciseList daily ->
       div [ classList [ ("dailyContainer", True ) ] ] 
           [ h2 [ classList [ ("title", True ) ] ] [ text daily.weekday ]
           , div [ classList [ ("dailyContainer", True ) ] ] 
             (List.map exerciseElement daily.exercises) 
+          , button [ classList [ ("fabs", True) ], onClick (ViewPlan Nothing) ] [ text "+" ]
           ]
-    DetailMode detail -> 
+    ExecutionDetail detail -> 
           div [ classList [ ("detailContainer", True) ] ]
               [ div [] [ text detail.name ]
               , div [] [ text detail.description ]

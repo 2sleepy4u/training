@@ -78,3 +78,17 @@ html, body {
     background-color: inherit;
 }
 
+.fabs {
+  position: fixed;
+  bottom: 10;
+  right: 10;
+  z-index: var(1);
+
+  background-color: red;
+  place-items: center;
+  border: none;
+  border-radius: 50px;
+
+  height: 50px;
+  width: 50px;
+}

@@ -34,7 +34,8 @@
             EE.execution_date = CURRENT_DATE
           AND EE.id_exercise_plan = EP.id_exercise_plan
       ) END AS done_reps,
-      COALESCE(EE.note, '') AS note
+        '' as note
+      --COALESCE(EE.note, '') AS note
     FROM
       ExercisePlan EP INNER JOIN
       Sessions S ON S.id_user = EP.id_user LEFT JOIN
@@ -42,5 +43,4 @@
       get_exercise_level(EP.id_exercise_plan) EL ON true   
     WHERE
       S.SSID = $1
-    AND EP.weekday = TRIM(To_Char(CURRENT_DATE, 'Day'))::Weekday
-
+    AND TRIM(To_Char(CURRENT_DATE, 'Day'))::Weekday = any(EP.weekday)

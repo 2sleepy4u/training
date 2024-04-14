@@ -6302,14 +6302,14 @@ var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$subscriptions = function (model) {
 	return $elm$core$Platform$Sub$none;
 };
-var $author$project$Main$DetailMode = function (a) {
-	return {$: 'DetailMode', a: a};
+var $author$project$Main$ExecutionDetail = function (a) {
+	return {$: 'ExecutionDetail', a: a};
+};
+var $author$project$Main$ExerciseList = function (a) {
+	return {$: 'ExerciseList', a: a};
 };
 var $author$project$Main$Failure = function (a) {
 	return {$: 'Failure', a: a};
-};
-var $author$project$Main$ListMode = function (a) {
-	return {$: 'ListMode', a: a};
 };
 var $author$project$Main$ViewList = {$: 'ViewList'};
 var $author$project$Main$InsertExecutionStatus = function (a) {
@@ -6513,13 +6513,40 @@ var $author$project$Main$update = F2(
 		update:
 		while (true) {
 			switch (msg.$) {
-				case 'RepInput':
+				case 'ViewPlan':
+					var maybePlan = msg.a;
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				case 'InputName':
+					var value = msg.a;
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				case 'InputDescription':
+					var value = msg.a;
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				case 'InputMinRep':
+					var value = msg.a;
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				case 'InputMaxRep':
+					var value = msg.a;
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				case 'InputMinSet':
+					var value = msg.a;
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				case 'InputMaxSet':
+					var value = msg.a;
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				case 'InputWeight':
+					var value = msg.a;
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				case 'InputWeightStep':
+					var value = msg.a;
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				case 'InputRep':
 					var set = msg.a;
 					var value = msg.b;
-					if (model.$ === 'DetailMode') {
+					if (model.$ === 'ExecutionDetail') {
 						var detail = model.a;
 						return _Utils_Tuple2(
-							$author$project$Main$DetailMode(
+							$author$project$Main$ExecutionDetail(
 								_Utils_update(
 									detail,
 									{
@@ -6542,7 +6569,7 @@ var $author$project$Main$update = F2(
 				case 'ViewDetail':
 					var exercise = msg.a;
 					return _Utils_Tuple2(
-						$author$project$Main$DetailMode(exercise),
+						$author$project$Main$ExecutionDetail(exercise),
 						$elm$core$Platform$Cmd$none);
 				case 'CreateExecution':
 					var exercise = msg.a;
@@ -6554,7 +6581,7 @@ var $author$project$Main$update = F2(
 					if (result.$ === 'Ok') {
 						var daily = result.a;
 						return _Utils_Tuple2(
-							$author$project$Main$ListMode(daily),
+							$author$project$Main$ExerciseList(daily),
 							$elm$core$Platform$Cmd$none);
 					} else {
 						var err = result.a;
@@ -6579,6 +6606,33 @@ var $author$project$Main$update = F2(
 	});
 var $author$project$Main$CreateExecution = function (a) {
 	return {$: 'CreateExecution', a: a};
+};
+var $author$project$Main$InputDescription = function (a) {
+	return {$: 'InputDescription', a: a};
+};
+var $author$project$Main$InputMaxRep = function (a) {
+	return {$: 'InputMaxRep', a: a};
+};
+var $author$project$Main$InputMaxSet = function (a) {
+	return {$: 'InputMaxSet', a: a};
+};
+var $author$project$Main$InputMinRep = function (a) {
+	return {$: 'InputMinRep', a: a};
+};
+var $author$project$Main$InputMinSet = function (a) {
+	return {$: 'InputMinSet', a: a};
+};
+var $author$project$Main$InputName = function (a) {
+	return {$: 'InputName', a: a};
+};
+var $author$project$Main$InputWeight = function (a) {
+	return {$: 'InputWeight', a: a};
+};
+var $author$project$Main$InputWeightStep = function (a) {
+	return {$: 'InputWeightStep', a: a};
+};
+var $author$project$Main$ViewPlan = function (a) {
+	return {$: 'ViewPlan', a: a};
 };
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$Attributes$stringProperty = F2(
@@ -6614,9 +6668,9 @@ var $elm$html$Html$Attributes$classList = function (classes) {
 				$elm$core$Tuple$first,
 				A2($elm$core$List$filter, $elm$core$Tuple$second, classes))));
 };
-var $author$project$Main$RepInput = F2(
+var $author$project$Main$InputRep = F2(
 	function (a, b) {
-		return {$: 'RepInput', a: a, b: b};
+		return {$: 'InputRep', a: a, b: b};
 	});
 var $elm$json$Json$Encode$bool = _Json_wrap;
 var $elm$html$Html$Attributes$boolProperty = F2(
@@ -6715,7 +6769,7 @@ var $author$project$Main$createRepContainer = F2(
 							$elm$html$Html$Attributes$type_('number'),
 							$elm$html$Html$Attributes$disabled(detail.is_done),
 							$elm$html$Html$Events$onInput(
-							$author$project$Main$RepInput(index)),
+							$author$project$Main$InputRep(index)),
 							$elm$html$Html$Attributes$value(
 							$elm$core$String$fromInt(
 								A2(
@@ -6852,7 +6906,109 @@ var $author$project$Main$view = function (model) {
 					[
 						$elm$html$Html$text('Error!')
 					]));
-		case 'ListMode':
+		case 'PlanDetail':
+			var plan = model.a;
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$classList(
+						_List_fromArray(
+							[
+								_Utils_Tuple2('planContainer', true)
+							]))
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$placeholder('Name'),
+								$elm$html$Html$Events$onInput($author$project$Main$InputName)
+							]),
+						_List_Nil),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$placeholder('Description'),
+								$elm$html$Html$Events$onInput($author$project$Main$InputDescription)
+							]),
+						_List_Nil),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$placeholder('Min rep'),
+								$elm$html$Html$Events$onInput($author$project$Main$InputMinRep),
+								$elm$html$Html$Attributes$type_('number')
+							]),
+						_List_Nil),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$placeholder('Max rep'),
+								$elm$html$Html$Events$onInput($author$project$Main$InputMaxRep),
+								$elm$html$Html$Attributes$type_('number')
+							]),
+						_List_Nil),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$placeholder('Min set'),
+								$elm$html$Html$Events$onInput($author$project$Main$InputMinSet),
+								$elm$html$Html$Attributes$type_('number')
+							]),
+						_List_Nil),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$placeholder('Max set'),
+								$elm$html$Html$Events$onInput($author$project$Main$InputMaxSet),
+								$elm$html$Html$Attributes$type_('number')
+							]),
+						_List_Nil),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$placeholder('Weight'),
+								$elm$html$Html$Events$onInput($author$project$Main$InputWeight),
+								$elm$html$Html$Attributes$type_('number')
+							]),
+						_List_Nil),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$placeholder('Weight step'),
+								$elm$html$Html$Events$onInput($author$project$Main$InputWeightStep),
+								$elm$html$Html$Attributes$type_('number')
+							]),
+						_List_Nil),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Events$onClick($author$project$Main$ViewList)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Go Back')
+							])),
+						A2(
+						$elm$html$Html$button,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Save')
+							]))
+					]));
+		case 'ExerciseList':
 			var daily = model.a;
 			return A2(
 				$elm$html$Html$div,
@@ -6890,7 +7046,23 @@ var $author$project$Main$view = function (model) {
 										_Utils_Tuple2('dailyContainer', true)
 									]))
 							]),
-						A2($elm$core$List$map, $author$project$Main$exerciseElement, daily.exercises))
+						A2($elm$core$List$map, $author$project$Main$exerciseElement, daily.exercises)),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$classList(
+								_List_fromArray(
+									[
+										_Utils_Tuple2('fabs', true)
+									])),
+								$elm$html$Html$Events$onClick(
+								$author$project$Main$ViewPlan($elm$core$Maybe$Nothing))
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('+')
+							]))
 					]));
 		default:
 			var detail = model.a;

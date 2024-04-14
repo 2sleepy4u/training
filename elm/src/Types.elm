@@ -8,6 +8,18 @@ type alias Daily =
     , exercises: List Exercise
     }
 
+type alias ExercisePlan = 
+  { id_plan: Maybe Int
+  , name: String
+  , description: String
+  , min_reps: Int
+  , max_reps: Int
+  , min_sets: Int
+  , max_sets: Int
+  , weight: Int
+  , weight_step: Int
+  }
+
 type alias Exercise = 
   { id_plan: Int
   , name: String

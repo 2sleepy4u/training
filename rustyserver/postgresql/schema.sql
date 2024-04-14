@@ -185,4 +185,4 @@ $$;
 
 
 
-
+INSERT INTO GeneralParams VALUES (1);

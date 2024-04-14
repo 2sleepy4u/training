@@ -13,7 +13,6 @@ use crate::auth::types::isAuth;
 pub struct Execution {
     pub id_plan: i32,
     pub reps: Vec<i32>,
-    //pub weight: f32,
     pub weight: i32,
     pub note: String
 }
@@ -29,9 +28,8 @@ pub struct Plan {
     pub min_sets: i32,
     pub max_sets: i32,
     pub min_weight: i32,
-    //pub weight_step: f32,
     pub weight_step: i32,
-    pub weekday: String,
+    pub weekday: Vec<String>,
     pub active: bool
 }
 
@@ -43,7 +41,6 @@ pub struct Exercise {
     pub description: String,
     pub reps: i32,
     pub sets: i32,
-    //pub weight: f32,
     pub weight: i32,
     pub is_done: bool,
     pub done_reps: Vec<i32>,
@@ -77,8 +74,8 @@ pub async fn get_daily(
     auth: isAuth,
     mut db: Connection<Training>
 ) -> Result<Json<Daily>, Status> {
-    let result = sqlx::query_as::<_, Exercise>(GET_DAILY)
-        //sqlx::query_file_as!(Exercise, "postgresql/queries/get_daily.sql", &auth.ssid)
+    let query = include_str!("./../postgresql/queries/get_daily.sql");
+    let result = sqlx::query_as::<_, Exercise>(query)
         .bind(&auth.ssid)
         .fetch_all(&mut **db)
         .await;
