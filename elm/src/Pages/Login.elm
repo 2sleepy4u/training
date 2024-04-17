@@ -1,4 +1,4 @@
-module Login exposing (..)
+module Pages.Login exposing (..)
 import Utility exposing (..)
 import Html.Attributes exposing (type_, classList, placeholder, value)
 import Html.Events exposing (onClick, onInput)
@@ -89,14 +89,4 @@ view model =
     , button [ onClick Login ] [ text "Login" ]
     ] 
 
-subscriptions : Model -> Sub Msg
-subscriptions model =
-  Sub.none
 
-main =
-  Browser.element
-    { init = init
-    , update = update
-    , subscriptions = subscriptions
-    , view = view
-    }

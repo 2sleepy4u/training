@@ -23,6 +23,7 @@ fn ping() -> String {
 pub async fn file_serve(path: PathBuf, auth: isAuth) -> Option<NamedFile> {
     debug!("{:?}", path);
     let mut path = Path::new(relative!("pages/app/")).join(path);
+    let mut path = Path::new(relative!("test/")).join(path);
     if path.is_dir() {
         path.push("index.html");
     }
@@ -58,9 +59,10 @@ fn rocket() -> _ {
                insert_plan,
                insert_execution,
                get_daily,
-               file_serve 
+               //file_serve 
         ])
-        .mount("/login", FileServer::from(relative!("pages/login/")))
+        //.mount("/login", FileServer::from(relative!("pages/login/")))
+        .mount("/", FileServer::from(relative!("static/")))
         .register("/", catchers![unauthorized])
             
 }
