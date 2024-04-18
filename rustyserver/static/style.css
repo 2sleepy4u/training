@@ -1,0 +1,175 @@
+html, body {
+    height: 100%;
+    color: #E4E4E4;
+    background-color: #212121;
+    overflow: hidden;
+}
+
+form {
+    text-align: center;
+    border: 1px solid;
+    border-radius: 15px;
+    width: 70%;
+    height: 60%;
+
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+form h2 {
+    padding-top: 12%;
+    padding-bottom: 12%;
+}
+
+form input {
+    font-size: inherit;
+    background-color: inherit;
+    color:inherit;
+
+    border: 1px solid;
+    border-radius: 15px;
+    padding: 8px;
+
+    display: block;
+    margin: auto;
+
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+form button {
+    height: 50px;
+    width: 50%;
+
+    border: 1px solid;
+    border-radius: 15px;
+    color:inherit;
+    background-color: inherit;
+
+    margin-top: 20%;
+}
+
+.loading {
+    margin: auto;
+    text-align: center;
+}
+
+.error {
+    margin: auto;
+    text-align: center;
+    color: red;
+}
+
+.btnReturn {
+    margin: auto;
+    text-align: center;
+    width: 50%;
+    display: block;
+    color: white;
+}
+
+.exerciseElement {
+    border: 1px solid black;
+    border-radius: 15px;
+    height: 50px;
+
+    padding: 10px;
+    margin: 10px;
+
+    text-align: center;
+    background-color: #131518;
+}
+
+.dailyContainer {
+    overflow: scroll;
+    flex: 1 1;
+    height: calc(100% - 15px);
+    display: flex;
+    flex-flow: column;
+}
+
+h2, .dailyContainer {
+    text-align: center;
+}
+
+h2 {
+    flex: 0 1;
+}
+
+.is_done {
+    background-color: #2e7d32;
+}
+
+html, body {
+    height: 100%;
+    color: #E4E4E4;
+    background-color: #212121;
+    overflow: hidden;
+}
+
+.repContainer * {
+    display: inline;
+}
+
+.setContainer {
+}
+
+.detailContainer input {
+    width: 30px;
+    font-size: inherit;
+    background-color: inherit;
+    border: none;
+    border-bottom: 1px solid;
+    color:inherit;
+}
+
+.detailContainer {
+    text-align: center;
+    margin: 5px;
+}
+
+.detailContainer * {
+    margin-top: 15px;
+}
+
+.detailContainer textarea {
+    min-height: 100px;
+    width: 100%;
+    background-color: inherit;
+    color:inherit;
+}
+.detailContainer button {
+    height: 50px;
+    width: 50%;
+
+    border: 1px solid;
+    border-radius: 15px;
+    color:inherit;
+    background-color: inherit;
+}
+
+.fabs {
+  position: fixed;
+  bottom: 10;
+  right: 10;
+  z-index: var(1);
+
+  background-color: red;
+  place-items: center;
+  border: none;
+  border-radius: 50px;
+
+  height: 50px;
+  width: 50px;
+}
+
+.weekdays {
+    display: inline;
+}
+
+.weekdays * {
+    display: inline;
+}

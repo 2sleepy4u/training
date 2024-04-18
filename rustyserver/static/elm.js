@@ -4545,7 +4545,50 @@ function _Http_track(router, xhr, tracker)
 			size: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
 		}))));
 	});
-}var $elm$core$Basics$EQ = {$: 'EQ'};
+}
+
+
+var _Bitwise_and = F2(function(a, b)
+{
+	return a & b;
+});
+
+var _Bitwise_or = F2(function(a, b)
+{
+	return a | b;
+});
+
+var _Bitwise_xor = F2(function(a, b)
+{
+	return a ^ b;
+});
+
+function _Bitwise_complement(a)
+{
+	return ~a;
+};
+
+var _Bitwise_shiftLeftBy = F2(function(offset, a)
+{
+	return a << offset;
+});
+
+var _Bitwise_shiftRightBy = F2(function(offset, a)
+{
+	return a >> offset;
+});
+
+var _Bitwise_shiftRightZfBy = F2(function(offset, a)
+{
+	return a >>> offset;
+});
+var $author$project$Main$LinkClicked = function (a) {
+	return {$: 'LinkClicked', a: a};
+};
+var $author$project$Main$UrlChanged = function (a) {
+	return {$: 'UrlChanged', a: a};
+};
+var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
 var $elm$core$List$cons = _List_cons;
@@ -5333,49 +5376,159 @@ var $elm$core$Task$perform = F2(
 			$elm$core$Task$Perform(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
-var $elm$browser$Browser$element = _Browser_element;
+var $elm$browser$Browser$application = _Browser_application;
+var $author$project$Main$NotFound = {$: 'NotFound'};
+var $author$project$Main$DailyMsg = function (a) {
+	return {$: 'DailyMsg', a: a};
+};
+var $author$project$Main$DailyPage = function (a) {
+	return {$: 'DailyPage', a: a};
+};
+var $author$project$Main$LoginMsg = function (a) {
+	return {$: 'LoginMsg', a: a};
+};
+var $author$project$Main$LoginPage = function (a) {
+	return {$: 'LoginPage', a: a};
+};
+var $author$project$Main$PlanMsg = function (a) {
+	return {$: 'PlanMsg', a: a};
+};
+var $author$project$Main$PlanPage = function (a) {
+	return {$: 'PlanPage', a: a};
+};
+var $elm$browser$Browser$Navigation$load = _Browser_load;
+var $elm$core$Platform$Cmd$map = _Platform_map;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Login$init = function (_v0) {
-	return _Utils_Tuple2(
-		{email: '', error: $elm$core$Maybe$Nothing, password: ''},
-		$elm$core$Platform$Cmd$none);
+var $author$project$Pages$DailyList$Loading = {$: 'Loading'};
+var $author$project$Pages$DailyList$GotExercise = function (a) {
+	return {$: 'GotExercise', a: a};
 };
-var $elm$core$Platform$Sub$batch = _Platform_batch;
-var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $author$project$Login$subscriptions = function (model) {
-	return $elm$core$Platform$Sub$none;
-};
-var $author$project$Login$GotNewSession = function (a) {
-	return {$: 'GotNewSession', a: a};
-};
-var $elm$json$Json$Encode$object = function (pairs) {
-	return _Json_wrap(
+var $author$project$Types$Daily = F2(
+	function (weekday, exercises) {
+		return {exercises: exercises, weekday: weekday};
+	});
+var $author$project$Types$Exercise = F9(
+	function (id_plan, name, description, reps, sets, weight, is_done, note, done_reps) {
+		return {description: description, done_reps: done_reps, id_plan: id_plan, is_done: is_done, name: name, note: note, reps: reps, sets: sets, weight: weight};
+	});
+var $elm$json$Json$Decode$bool = _Json_decodeBool;
+var $elm$json$Json$Decode$int = _Json_decodeInt;
+var $elm$json$Json$Decode$list = _Json_decodeList;
+var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom = $elm$json$Json$Decode$map2($elm$core$Basics$apR);
+var $elm$json$Json$Decode$andThen = _Json_andThen;
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
+	});
+var $elm$json$Json$Decode$decodeValue = _Json_run;
+var $elm$json$Json$Decode$null = _Json_decodeNull;
+var $elm$json$Json$Decode$oneOf = _Json_oneOf;
+var $elm$json$Json$Decode$value = _Json_decodeValue;
+var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$optionalDecoder = F3(
+	function (path, valDecoder, fallback) {
+		var nullOr = function (decoder) {
+			return $elm$json$Json$Decode$oneOf(
+				_List_fromArray(
+					[
+						decoder,
+						$elm$json$Json$Decode$null(fallback)
+					]));
+		};
+		var handleResult = function (input) {
+			var _v0 = A2(
+				$elm$json$Json$Decode$decodeValue,
+				A2($elm$json$Json$Decode$at, path, $elm$json$Json$Decode$value),
+				input);
+			if (_v0.$ === 'Ok') {
+				var rawValue = _v0.a;
+				var _v1 = A2(
+					$elm$json$Json$Decode$decodeValue,
+					nullOr(valDecoder),
+					rawValue);
+				if (_v1.$ === 'Ok') {
+					var finalResult = _v1.a;
+					return $elm$json$Json$Decode$succeed(finalResult);
+				} else {
+					return A2(
+						$elm$json$Json$Decode$at,
+						path,
+						nullOr(valDecoder));
+				}
+			} else {
+				return $elm$json$Json$Decode$succeed(fallback);
+			}
+		};
+		return A2($elm$json$Json$Decode$andThen, handleResult, $elm$json$Json$Decode$value);
+	});
+var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$optional = F4(
+	function (key, valDecoder, fallback, decoder) {
+		return A2(
+			$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom,
+			A3(
+				$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$optionalDecoder,
+				_List_fromArray(
+					[key]),
+				valDecoder,
+				fallback),
+			decoder);
+	});
+var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required = F3(
+	function (key, valDecoder, decoder) {
+		return A2(
+			$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom,
+			A2($elm$json$Json$Decode$field, key, valDecoder),
+			decoder);
+	});
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $author$project$Types$exerciseDecoder = A4(
+	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$optional,
+	'done_reps',
+	$elm$json$Json$Decode$list($elm$json$Json$Decode$int),
+	_List_Nil,
+	A4(
+		$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$optional,
+		'note',
+		$elm$json$Json$Decode$string,
+		'',
 		A3(
-			$elm$core$List$foldl,
-			F2(
-				function (_v0, obj) {
-					var k = _v0.a;
-					var v = _v0.b;
-					return A3(_Json_addField, k, v, obj);
-				}),
-			_Json_emptyObject(_Utils_Tuple0),
-			pairs));
-};
-var $elm$json$Json$Encode$string = _Json_wrap;
-var $author$project$Login$encodeCredentials = function (credentials) {
-	return $elm$json$Json$Encode$object(
-		_List_fromArray(
-			[
-				_Utils_Tuple2(
-				'email',
-				$elm$json$Json$Encode$string(credentials.email)),
-				_Utils_Tuple2(
-				'password',
-				$elm$json$Json$Encode$string(credentials.password))
-			]));
-};
-var $author$project$Login$endpoint = 'http://192.168.0.194:8080';
+			$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+			'is_done',
+			$elm$json$Json$Decode$bool,
+			A3(
+				$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+				'weight',
+				$elm$json$Json$Decode$int,
+				A3(
+					$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+					'sets',
+					$elm$json$Json$Decode$int,
+					A3(
+						$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+						'reps',
+						$elm$json$Json$Decode$int,
+						A3(
+							$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+							'description',
+							$elm$json$Json$Decode$string,
+							A3(
+								$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+								'name',
+								$elm$json$Json$Decode$string,
+								A3(
+									$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+									'id_plan',
+									$elm$json$Json$Decode$int,
+									$elm$json$Json$Decode$succeed($author$project$Types$Exercise))))))))));
+var $author$project$Types$dailyDecoder = A3(
+	$elm$json$Json$Decode$map2,
+	$author$project$Types$Daily,
+	A2($elm$json$Json$Decode$field, 'weekday', $elm$json$Json$Decode$string),
+	A2(
+		$elm$json$Json$Decode$field,
+		'exercises',
+		$elm$json$Json$Decode$list($author$project$Types$exerciseDecoder)));
 var $elm$http$Http$BadStatus_ = F2(
 	function (a, b) {
 		return {$: 'BadStatus_', a: a, b: b};
@@ -5918,18 +6071,32 @@ var $elm$core$Dict$update = F3(
 			return A2($elm$core$Dict$remove, targetKey, dictionary);
 		}
 	});
+var $elm$http$Http$emptyBody = _Http_emptyBody;
+var $author$project$Pages$DailyList$endpoint = 'http://192.168.0.194:8080';
+var $elm$json$Json$Decode$decodeString = _Json_runOnString;
 var $elm$core$Basics$composeR = F3(
 	function (f, g, x) {
 		return g(
 			f(x));
 	});
-var $elm$http$Http$expectBytesResponse = F2(
+var $elm$http$Http$expectStringResponse = F2(
 	function (toMsg, toResult) {
 		return A3(
 			_Http_expect,
-			'arraybuffer',
-			_Http_toDataView,
+			'',
+			$elm$core$Basics$identity,
 			A2($elm$core$Basics$composeR, toResult, toMsg));
+	});
+var $elm$core$Result$mapError = F2(
+	function (f, result) {
+		if (result.$ === 'Ok') {
+			var v = result.a;
+			return $elm$core$Result$Ok(v);
+		} else {
+			var e = result.a;
+			return $elm$core$Result$Err(
+				f(e));
+		}
 	});
 var $elm$http$Http$BadBody = function (a) {
 	return {$: 'BadBody', a: a};
@@ -5942,17 +6109,6 @@ var $elm$http$Http$BadUrl = function (a) {
 };
 var $elm$http$Http$NetworkError = {$: 'NetworkError'};
 var $elm$http$Http$Timeout = {$: 'Timeout'};
-var $elm$core$Result$mapError = F2(
-	function (f, result) {
-		if (result.$ === 'Ok') {
-			var v = result.a;
-			return $elm$core$Result$Ok(v);
-		} else {
-			var e = result.a;
-			return $elm$core$Result$Err(
-				f(e));
-		}
-	});
 var $elm$http$Http$resolve = F2(
 	function (toResult, response) {
 		switch (response.$) {
@@ -5976,21 +6132,19 @@ var $elm$http$Http$resolve = F2(
 					toResult(body));
 		}
 	});
-var $elm$http$Http$expectWhatever = function (toMsg) {
-	return A2(
-		$elm$http$Http$expectBytesResponse,
-		toMsg,
-		$elm$http$Http$resolve(
-			function (_v0) {
-				return $elm$core$Result$Ok(_Utils_Tuple0);
-			}));
-};
-var $elm$http$Http$jsonBody = function (value) {
-	return A2(
-		_Http_pair,
-		'application/json',
-		A2($elm$json$Json$Encode$encode, 0, value));
-};
+var $elm$http$Http$expectJson = F2(
+	function (toMsg, decoder) {
+		return A2(
+			$elm$http$Http$expectStringResponse,
+			toMsg,
+			$elm$http$Http$resolve(
+				function (string) {
+					return A2(
+						$elm$core$Result$mapError,
+						$elm$json$Json$Decode$errorToString,
+						A2($elm$json$Json$Decode$decodeString, decoder, string));
+				}));
+	});
 var $elm$http$Http$Request = function (a) {
 	return {$: 'Request', a: a};
 };
@@ -6159,18 +6313,246 @@ var $elm$http$Http$riskyRequest = function (r) {
 		$elm$http$Http$Request(
 			{allowCookiesFromOtherDomains: true, body: r.body, expect: r.expect, headers: r.headers, method: r.method, timeout: r.timeout, tracker: r.tracker, url: r.url}));
 };
-var $author$project$Login$getNewSession = function (model) {
+var $author$project$Pages$DailyList$getExerciseList = $elm$http$Http$riskyRequest(
+	{
+		body: $elm$http$Http$emptyBody,
+		expect: A2($elm$http$Http$expectJson, $author$project$Pages$DailyList$GotExercise, $author$project$Types$dailyDecoder),
+		headers: _List_Nil,
+		method: 'get',
+		timeout: $elm$core$Maybe$Nothing,
+		tracker: $elm$core$Maybe$Nothing,
+		url: $author$project$Pages$DailyList$endpoint + '/get_daily'
+	});
+var $author$project$Pages$DailyList$init = function (_v0) {
+	return _Utils_Tuple2($author$project$Pages$DailyList$Loading, $author$project$Pages$DailyList$getExerciseList);
+};
+var $author$project$Pages$Login$init = function (_v0) {
+	return _Utils_Tuple2(
+		{email: '', error: $elm$core$Maybe$Nothing, password: ''},
+		$elm$core$Platform$Cmd$none);
+};
+var $author$project$Pages$Plan$init = function (_v0) {
+	return _Utils_Tuple2(
+		{description: '', id_plan: $elm$core$Maybe$Nothing, max_reps: 0, max_sets: 0, min_reps: 0, min_sets: 0, name: '', weekday: _List_Nil, weight: 0, weight_step: 0},
+		$elm$core$Platform$Cmd$none);
+};
+var $author$project$Main$pathResolve = F2(
+	function (model, path) {
+		switch (path) {
+			case '/login':
+				var _v1 = $author$project$Pages$Login$init(_Utils_Tuple0);
+				var subModel = _v1.a;
+				var cmd = _v1.b;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							page: $author$project$Main$LoginPage(
+								_Utils_Tuple2(subModel, cmd))
+						}),
+					A2($elm$core$Platform$Cmd$map, $author$project$Main$LoginMsg, cmd));
+			case '/':
+				var _v2 = $author$project$Pages$DailyList$init(_Utils_Tuple0);
+				var dailyModel = _v2.a;
+				var cmd = _v2.b;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							page: $author$project$Main$DailyPage(
+								_Utils_Tuple2(dailyModel, cmd))
+						}),
+					A2($elm$core$Platform$Cmd$map, $author$project$Main$DailyMsg, cmd));
+			case '/addPlan':
+				var _v3 = $author$project$Pages$Plan$init(_Utils_Tuple0);
+				var subModel = _v3.a;
+				var cmd = _v3.b;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							page: $author$project$Main$PlanPage(
+								_Utils_Tuple2(subModel, cmd))
+						}),
+					A2($elm$core$Platform$Cmd$map, $author$project$Main$PlanMsg, cmd));
+			default:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{page: $author$project$Main$NotFound}),
+					$elm$core$Platform$Cmd$none);
+		}
+	});
+var $elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
+var $elm$url$Url$addPort = F2(
+	function (maybePort, starter) {
+		if (maybePort.$ === 'Nothing') {
+			return starter;
+		} else {
+			var port_ = maybePort.a;
+			return starter + (':' + $elm$core$String$fromInt(port_));
+		}
+	});
+var $elm$url$Url$addPrefixed = F3(
+	function (prefix, maybeSegment, starter) {
+		if (maybeSegment.$ === 'Nothing') {
+			return starter;
+		} else {
+			var segment = maybeSegment.a;
+			return _Utils_ap(
+				starter,
+				_Utils_ap(prefix, segment));
+		}
+	});
+var $elm$url$Url$toString = function (url) {
+	var http = function () {
+		var _v0 = url.protocol;
+		if (_v0.$ === 'Http') {
+			return 'http://';
+		} else {
+			return 'https://';
+		}
+	}();
+	return A3(
+		$elm$url$Url$addPrefixed,
+		'#',
+		url.fragment,
+		A3(
+			$elm$url$Url$addPrefixed,
+			'?',
+			url.query,
+			_Utils_ap(
+				A2(
+					$elm$url$Url$addPort,
+					url.port_,
+					_Utils_ap(http, url.host)),
+				url.path)));
+};
+var $author$project$Pages$DailyList$ExecutionDetail = function (a) {
+	return {$: 'ExecutionDetail', a: a};
+};
+var $author$project$Pages$DailyList$ExerciseList = function (a) {
+	return {$: 'ExerciseList', a: a};
+};
+var $author$project$Pages$DailyList$Failure = function (a) {
+	return {$: 'Failure', a: a};
+};
+var $author$project$Pages$DailyList$ViewList = {$: 'ViewList'};
+var $author$project$Pages$DailyList$InsertExecutionStatus = function (a) {
+	return {$: 'InsertExecutionStatus', a: a};
+};
+var $elm$json$Json$Encode$int = _Json_wrap;
+var $elm$json$Json$Encode$list = F2(
+	function (func, entries) {
+		return _Json_wrap(
+			A3(
+				$elm$core$List$foldl,
+				_Json_addEntry(func),
+				_Json_emptyArray(_Utils_Tuple0),
+				entries));
+	});
+var $elm$json$Json$Encode$object = function (pairs) {
+	return _Json_wrap(
+		A3(
+			$elm$core$List$foldl,
+			F2(
+				function (_v0, obj) {
+					var k = _v0.a;
+					var v = _v0.b;
+					return A3(_Json_addField, k, v, obj);
+				}),
+			_Json_emptyObject(_Utils_Tuple0),
+			pairs));
+};
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $author$project$Types$encodeExecution = function (exercise) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'id_plan',
+				$elm$json$Json$Encode$int(exercise.id_plan)),
+				_Utils_Tuple2(
+				'weight',
+				$elm$json$Json$Encode$int(exercise.weight)),
+				_Utils_Tuple2(
+				'note',
+				$elm$json$Json$Encode$string(exercise.note)),
+				_Utils_Tuple2(
+				'reps',
+				A2($elm$json$Json$Encode$list, $elm$json$Json$Encode$int, exercise.done_reps))
+			]));
+};
+var $elm$http$Http$expectBytesResponse = F2(
+	function (toMsg, toResult) {
+		return A3(
+			_Http_expect,
+			'arraybuffer',
+			_Http_toDataView,
+			A2($elm$core$Basics$composeR, toResult, toMsg));
+	});
+var $elm$http$Http$expectWhatever = function (toMsg) {
+	return A2(
+		$elm$http$Http$expectBytesResponse,
+		toMsg,
+		$elm$http$Http$resolve(
+			function (_v0) {
+				return $elm$core$Result$Ok(_Utils_Tuple0);
+			}));
+};
+var $elm$http$Http$jsonBody = function (value) {
+	return A2(
+		_Http_pair,
+		'application/json',
+		A2($elm$json$Json$Encode$encode, 0, value));
+};
+var $author$project$Pages$DailyList$createExecution = function (exercise) {
 	return $elm$http$Http$riskyRequest(
 		{
 			body: $elm$http$Http$jsonBody(
-				$author$project$Login$encodeCredentials(model)),
-			expect: $elm$http$Http$expectWhatever($author$project$Login$GotNewSession),
+				$author$project$Types$encodeExecution(exercise)),
+			expect: $elm$http$Http$expectWhatever($author$project$Pages$DailyList$InsertExecutionStatus),
 			headers: _List_Nil,
 			method: 'post',
 			timeout: $elm$core$Maybe$Nothing,
 			tracker: $elm$core$Maybe$Nothing,
-			url: $author$project$Login$endpoint + '/get_new_session'
+			url: $author$project$Pages$DailyList$endpoint + '/insert_execution'
 		});
+};
+var $elm$core$Array$fromListHelp = F3(
+	function (list, nodeList, nodeListSize) {
+		fromListHelp:
+		while (true) {
+			var _v0 = A2($elm$core$Elm$JsArray$initializeFromList, $elm$core$Array$branchFactor, list);
+			var jsArray = _v0.a;
+			var remainingItems = _v0.b;
+			if (_Utils_cmp(
+				$elm$core$Elm$JsArray$length(jsArray),
+				$elm$core$Array$branchFactor) < 0) {
+				return A2(
+					$elm$core$Array$builderToArray,
+					true,
+					{nodeList: nodeList, nodeListSize: nodeListSize, tail: jsArray});
+			} else {
+				var $temp$list = remainingItems,
+					$temp$nodeList = A2(
+					$elm$core$List$cons,
+					$elm$core$Array$Leaf(jsArray),
+					nodeList),
+					$temp$nodeListSize = nodeListSize + 1;
+				list = $temp$list;
+				nodeList = $temp$nodeList;
+				nodeListSize = $temp$nodeListSize;
+				continue fromListHelp;
+			}
+		}
+	});
+var $elm$core$Array$fromList = function (list) {
+	if (!list.b) {
+		return $elm$core$Array$empty;
+	} else {
+		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
+	}
 };
 var $author$project$Utility$httpErrorDecode = function (err) {
 	switch (err.$) {
@@ -6189,14 +6571,176 @@ var $author$project$Utility$httpErrorDecode = function (err) {
 			return txt;
 	}
 };
-var $elm$browser$Browser$Navigation$load = _Browser_load;
-var $author$project$Login$update = F2(
+var $elm$core$Bitwise$and = _Bitwise_and;
+var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
+var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
+var $elm$core$Basics$ge = _Utils_ge;
+var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
+var $elm$core$Elm$JsArray$unsafeSet = _JsArray_unsafeSet;
+var $elm$core$Array$setHelp = F4(
+	function (shift, index, value, tree) {
+		var pos = $elm$core$Array$bitMask & (index >>> shift);
+		var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+		if (_v0.$ === 'SubTree') {
+			var subTree = _v0.a;
+			var newSub = A4($elm$core$Array$setHelp, shift - $elm$core$Array$shiftStep, index, value, subTree);
+			return A3(
+				$elm$core$Elm$JsArray$unsafeSet,
+				pos,
+				$elm$core$Array$SubTree(newSub),
+				tree);
+		} else {
+			var values = _v0.a;
+			var newLeaf = A3($elm$core$Elm$JsArray$unsafeSet, $elm$core$Array$bitMask & index, value, values);
+			return A3(
+				$elm$core$Elm$JsArray$unsafeSet,
+				pos,
+				$elm$core$Array$Leaf(newLeaf),
+				tree);
+		}
+	});
+var $elm$core$Bitwise$shiftLeftBy = _Bitwise_shiftLeftBy;
+var $elm$core$Array$tailIndex = function (len) {
+	return (len >>> 5) << 5;
+};
+var $elm$core$Array$set = F3(
+	function (index, value, array) {
+		var len = array.a;
+		var startShift = array.b;
+		var tree = array.c;
+		var tail = array.d;
+		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? array : ((_Utils_cmp(
+			index,
+			$elm$core$Array$tailIndex(len)) > -1) ? A4(
+			$elm$core$Array$Array_elm_builtin,
+			len,
+			startShift,
+			tree,
+			A3($elm$core$Elm$JsArray$unsafeSet, $elm$core$Array$bitMask & index, value, tail)) : A4(
+			$elm$core$Array$Array_elm_builtin,
+			len,
+			startShift,
+			A4($elm$core$Array$setHelp, startShift, index, value, tree),
+			tail));
+	});
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Pages$DailyList$update = F2(
+	function (msg, model) {
+		update:
+		while (true) {
+			switch (msg.$) {
+				case 'InputRep':
+					var set = msg.a;
+					var value = msg.b;
+					if (model.$ === 'ExecutionDetail') {
+						var detail = model.a;
+						return _Utils_Tuple2(
+							$author$project$Pages$DailyList$ExecutionDetail(
+								_Utils_update(
+									detail,
+									{
+										done_reps: $elm$core$Array$toList(
+											A3(
+												$elm$core$Array$set,
+												set,
+												A2(
+													$elm$core$Maybe$withDefault,
+													0,
+													$elm$core$String$toInt(value)),
+												$elm$core$Array$fromList(detail.done_reps)))
+									})),
+							$elm$core$Platform$Cmd$none);
+					} else {
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					}
+				case 'ViewList':
+					return _Utils_Tuple2(model, $author$project$Pages$DailyList$getExerciseList);
+				case 'ViewDetail':
+					var exercise = msg.a;
+					return _Utils_Tuple2(
+						$author$project$Pages$DailyList$ExecutionDetail(exercise),
+						$elm$core$Platform$Cmd$none);
+				case 'CreateExecution':
+					var exercise = msg.a;
+					return _Utils_Tuple2(
+						model,
+						$author$project$Pages$DailyList$createExecution(exercise));
+				case 'GotExercise':
+					var result = msg.a;
+					if (result.$ === 'Ok') {
+						var daily = result.a;
+						return _Utils_Tuple2(
+							$author$project$Pages$DailyList$ExerciseList(daily),
+							$elm$core$Platform$Cmd$none);
+					} else {
+						var err = result.a;
+						return _Utils_Tuple2(
+							$author$project$Pages$DailyList$Failure(
+								$author$project$Utility$httpErrorDecode(err)),
+							$elm$core$Platform$Cmd$none);
+					}
+				case 'InsertExecutionStatus':
+					var result = msg.a;
+					if (result.$ === 'Ok') {
+						var $temp$msg = $author$project$Pages$DailyList$ViewList,
+							$temp$model = model;
+						msg = $temp$msg;
+						model = $temp$model;
+						continue update;
+					} else {
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					}
+				default:
+					return _Utils_Tuple2(
+						model,
+						$elm$browser$Browser$Navigation$load('/addPlan'));
+			}
+		}
+	});
+var $author$project$Pages$Login$GotNewSession = function (a) {
+	return {$: 'GotNewSession', a: a};
+};
+var $author$project$Pages$Login$encodeCredentials = function (credentials) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'email',
+				$elm$json$Json$Encode$string(credentials.email)),
+				_Utils_Tuple2(
+				'password',
+				$elm$json$Json$Encode$string(credentials.password))
+			]));
+};
+var $author$project$Pages$Login$endpoint = 'http://192.168.0.194:8080';
+var $author$project$Pages$Login$getNewSession = function (model) {
+	return $elm$http$Http$riskyRequest(
+		{
+			body: $elm$http$Http$jsonBody(
+				$author$project$Pages$Login$encodeCredentials(model)),
+			expect: $elm$http$Http$expectWhatever($author$project$Pages$Login$GotNewSession),
+			headers: _List_Nil,
+			method: 'post',
+			timeout: $elm$core$Maybe$Nothing,
+			tracker: $elm$core$Maybe$Nothing,
+			url: $author$project$Pages$Login$endpoint + '/get_new_session'
+		});
+};
+var $author$project$Pages$Login$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
 			case 'Login':
 				return _Utils_Tuple2(
 					model,
-					$author$project$Login$getNewSession(model));
+					$author$project$Pages$Login$getNewSession(model));
 			case 'GotNewSession':
 				var result = msg.a;
 				if (result.$ === 'Ok') {
@@ -6230,40 +6774,347 @@ var $author$project$Login$update = F2(
 					$elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$Login$InputEmail = function (a) {
-	return {$: 'InputEmail', a: a};
-};
-var $author$project$Login$InputPassword = function (a) {
-	return {$: 'InputPassword', a: a};
-};
-var $author$project$Login$Login = {$: 'Login'};
-var $elm$html$Html$button = _VirtualDom_node('button');
-var $elm$html$Html$form = _VirtualDom_node('form');
-var $elm$html$Html$h2 = _VirtualDom_node('h2');
-var $elm$html$Html$input = _VirtualDom_node('input');
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
+var $elm$core$List$partition = F2(
+	function (pred, list) {
+		var step = F2(
+			function (x, _v0) {
+				var trues = _v0.a;
+				var falses = _v0.b;
+				return pred(x) ? _Utils_Tuple2(
+					A2($elm$core$List$cons, x, trues),
+					falses) : _Utils_Tuple2(
+					trues,
+					A2($elm$core$List$cons, x, falses));
+			});
+		return A3(
+			$elm$core$List$foldr,
+			step,
+			_Utils_Tuple2(_List_Nil, _List_Nil),
+			list);
 	});
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
+var $author$project$Pages$Plan$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 'InputName':
+				var value = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{name: value}),
+					$elm$core$Platform$Cmd$none);
+			case 'InputDescription':
+				var value = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{description: value}),
+					$elm$core$Platform$Cmd$none);
+			case 'InputWeekday':
+				var weekday = msg.a;
+				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+			case 'InputMinRep':
+				var value = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							min_reps: A2(
+								$elm$core$Maybe$withDefault,
+								1,
+								$elm$core$String$toInt(value))
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'InputMaxRep':
+				var value = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							max_reps: A2(
+								$elm$core$Maybe$withDefault,
+								1,
+								$elm$core$String$toInt(value))
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'InputMinSet':
+				var value = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							min_sets: A2(
+								$elm$core$Maybe$withDefault,
+								1,
+								$elm$core$String$toInt(value))
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'InputMaxSet':
+				var value = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							max_sets: A2(
+								$elm$core$Maybe$withDefault,
+								1,
+								$elm$core$String$toInt(value))
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'InputWeight':
+				var value = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							weight: A2(
+								$elm$core$Maybe$withDefault,
+								1,
+								$elm$core$String$toInt(value))
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'InputWeightStep':
+				var value = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							weight_step: A2(
+								$elm$core$Maybe$withDefault,
+								1,
+								$elm$core$String$toInt(value))
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'AddWeekday':
+				var item = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							weekday: _Utils_ap(
+								model.weekday,
+								_List_fromArray(
+									[item]))
+						}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				var item = msg.a;
+				var _v1 = A2(
+					$elm$core$List$partition,
+					function (x) {
+						return _Utils_eq(x, item);
+					},
+					model.weekday);
+				var newSelected = _v1.b;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{weekday: newSelected}),
+					$elm$core$Platform$Cmd$none);
+		}
+	});
+var $author$project$Main$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 'UrlChanged':
+				var url = msg.a;
+				return A2($author$project$Main$pathResolve, model, url.path);
+			case 'LinkClicked':
+				var urlRequest = msg.a;
+				if (urlRequest.$ === 'Internal') {
+					var url = urlRequest.a;
+					return _Utils_Tuple2(
+						model,
+						A2(
+							$elm$browser$Browser$Navigation$pushUrl,
+							model.key,
+							$elm$url$Url$toString(url)));
+				} else {
+					var href = urlRequest.a;
+					return _Utils_Tuple2(
+						model,
+						$elm$browser$Browser$Navigation$load(href));
+				}
+			case 'LoginMsg':
+				var loginMsg = msg.a;
+				var _v2 = model.page;
+				if (_v2.$ === 'LoginPage') {
+					var loginPage = _v2.a;
+					var _v3 = loginPage;
+					var loginModel = _v3.a;
+					var _v4 = A2($author$project$Pages$Login$update, loginMsg, loginModel);
+					var newSubModel = _v4.a;
+					var cmd = _v4.b;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								page: $author$project$Main$LoginPage(
+									_Utils_Tuple2(newSubModel, $elm$core$Platform$Cmd$none))
+							}),
+						A2($elm$core$Platform$Cmd$map, $author$project$Main$LoginMsg, cmd));
+				} else {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				}
+			case 'DailyMsg':
+				var dailyMsg = msg.a;
+				var _v5 = model.page;
+				if (_v5.$ === 'DailyPage') {
+					var dailyPage = _v5.a;
+					var _v6 = dailyPage;
+					var dailyModel = _v6.a;
+					var _v7 = A2($author$project$Pages$DailyList$update, dailyMsg, dailyModel);
+					var newSubModel = _v7.a;
+					var cmd = _v7.b;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								page: $author$project$Main$DailyPage(
+									_Utils_Tuple2(newSubModel, $elm$core$Platform$Cmd$none))
+							}),
+						A2($elm$core$Platform$Cmd$map, $author$project$Main$DailyMsg, cmd));
+				} else {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				}
+			default:
+				var subMsg = msg.a;
+				var _v8 = model.page;
+				if (_v8.$ === 'PlanPage') {
+					var page = _v8.a;
+					var _v9 = page;
+					var subModel = _v9.a;
+					var _v10 = A2($author$project$Pages$Plan$update, subMsg, subModel);
+					var newSubModel = _v10.a;
+					var cmd = _v10.b;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								page: $author$project$Main$PlanPage(
+									_Utils_Tuple2(newSubModel, $elm$core$Platform$Cmd$none))
+							}),
+						A2($elm$core$Platform$Cmd$map, $author$project$Main$PlanMsg, cmd));
+				} else {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				}
+		}
+	});
+var $author$project$Main$init = F3(
+	function (flags, url, key) {
+		return A2(
+			$author$project$Main$update,
+			$author$project$Main$UrlChanged(url),
+			{key: key, page: $author$project$Main$NotFound, url: url});
+	});
+var $elm$core$Platform$Sub$batch = _Platform_batch;
+var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
+var $author$project$Main$subscriptions = function (_v0) {
+	return $elm$core$Platform$Sub$none;
 };
+var $elm$html$Html$a = _VirtualDom_node('a');
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$string(string));
+	});
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
+var $elm$html$Html$Attributes$classList = function (classes) {
+	return $elm$html$Html$Attributes$class(
+		A2(
+			$elm$core$String$join,
+			' ',
+			A2(
+				$elm$core$List$map,
+				$elm$core$Tuple$first,
+				A2($elm$core$List$filter, $elm$core$Tuple$second, classes))));
+};
+var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$html$Html$Attributes$href = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'href',
+		_VirtualDom_noJavaScriptUri(url));
+};
+var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
+var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Pages$DailyList$AddPlan = {$: 'AddPlan'};
+var $author$project$Pages$DailyList$CreateExecution = function (a) {
+	return {$: 'CreateExecution', a: a};
+};
+var $elm$html$Html$button = _VirtualDom_node('button');
+var $author$project$Pages$DailyList$InputRep = F2(
+	function (a, b) {
+		return {$: 'InputRep', a: a, b: b};
+	});
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
+var $elm$core$Array$getHelp = F3(
+	function (shift, index, tree) {
+		getHelp:
+		while (true) {
+			var pos = $elm$core$Array$bitMask & (index >>> shift);
+			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+			if (_v0.$ === 'SubTree') {
+				var subTree = _v0.a;
+				var $temp$shift = shift - $elm$core$Array$shiftStep,
+					$temp$index = index,
+					$temp$tree = subTree;
+				shift = $temp$shift;
+				index = $temp$index;
+				tree = $temp$tree;
+				continue getHelp;
+			} else {
+				var values = _v0.a;
+				return A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, values);
+			}
+		}
+	});
+var $elm$core$Array$get = F2(
+	function (index, _v0) {
+		var len = _v0.a;
+		var startShift = _v0.b;
+		var tree = _v0.c;
+		var tail = _v0.d;
+		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? $elm$core$Maybe$Nothing : ((_Utils_cmp(
+			index,
+			$elm$core$Array$tailIndex(len)) > -1) ? $elm$core$Maybe$Just(
+			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
+			A3($elm$core$Array$getHelp, startShift, index, tree)));
+	});
+var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
 var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
 	return {$: 'MayStopPropagation', a: a};
 };
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
 var $elm$html$Html$Events$stopPropagationOn = F2(
 	function (event, decoder) {
 		return A2(
@@ -6271,12 +7122,6 @@ var $elm$html$Html$Events$stopPropagationOn = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
 	});
-var $elm$json$Json$Decode$field = _Json_decodeField;
-var $elm$json$Json$Decode$at = F2(
-	function (fields, decoder) {
-		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
-	});
-var $elm$json$Json$Decode$string = _Json_decodeString;
 var $elm$html$Html$Events$targetValue = A2(
 	$elm$json$Json$Decode$at,
 	_List_fromArray(
@@ -6291,19 +7136,328 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			$elm$html$Html$Events$alwaysStop,
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
-var $elm$html$Html$Attributes$stringProperty = F2(
-	function (key, string) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$string(string));
-	});
-var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$Login$view = function (model) {
+var $author$project$Pages$DailyList$createRepContainer = F2(
+	function (index, detail) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$classList(
+					_List_fromArray(
+						[
+							_Utils_Tuple2('repContainer', true)
+						]))
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$input,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$type_('number'),
+							$elm$html$Html$Attributes$disabled(detail.is_done),
+							$elm$html$Html$Events$onInput(
+							$author$project$Pages$DailyList$InputRep(index)),
+							$elm$html$Html$Attributes$value(
+							$elm$core$String$fromInt(
+								A2(
+									$elm$core$Maybe$withDefault,
+									0,
+									A2(
+										$elm$core$Array$get,
+										index,
+										$elm$core$Array$fromList(detail.done_reps)))))
+						]),
+					_List_Nil),
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('/')
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text(
+							$elm$core$String$fromInt(detail.reps))
+						]))
+				]));
+	});
+var $author$project$Pages$DailyList$ViewDetail = function (a) {
+	return {$: 'ViewDetail', a: a};
+};
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $author$project$Pages$DailyList$exerciseElement = function (exercise) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Events$onClick(
+				$author$project$Pages$DailyList$ViewDetail(exercise)),
+				$elm$html$Html$Attributes$classList(
+				_List_fromArray(
+					[
+						_Utils_Tuple2('is_done', exercise.is_done),
+						_Utils_Tuple2('exerciseElement', true)
+					]))
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(exercise.name)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(exercise.description)
+					]))
+			]));
+};
+var $elm$html$Html$h2 = _VirtualDom_node('h2');
+var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
+var $elm$core$List$repeatHelp = F3(
+	function (result, n, value) {
+		repeatHelp:
+		while (true) {
+			if (n <= 0) {
+				return result;
+			} else {
+				var $temp$result = A2($elm$core$List$cons, value, result),
+					$temp$n = n - 1,
+					$temp$value = value;
+				result = $temp$result;
+				n = $temp$n;
+				value = $temp$value;
+				continue repeatHelp;
+			}
+		}
+	});
+var $elm$core$List$repeat = F2(
+	function (n, value) {
+		return A3($elm$core$List$repeatHelp, _List_Nil, n, value);
+	});
+var $elm$html$Html$textarea = _VirtualDom_node('textarea');
+var $author$project$Pages$DailyList$view = function (model) {
+	switch (model.$) {
+		case 'Loading':
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$classList(
+						_List_fromArray(
+							[
+								_Utils_Tuple2('loading', true)
+							]))
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Loading...')
+					]));
+		case 'Failure':
+			var err = model.a;
+			return A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$classList(
+								_List_fromArray(
+									[
+										_Utils_Tuple2('error', true)
+									]))
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Error!')
+							])),
+						A2(
+						$elm$html$Html$a,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$href('/login')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Return to login page')
+							]))
+					]));
+		case 'ExerciseList':
+			var daily = model.a;
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$classList(
+						_List_fromArray(
+							[
+								_Utils_Tuple2('dailyContainer', true)
+							]))
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$h2,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$classList(
+								_List_fromArray(
+									[
+										_Utils_Tuple2('title', true)
+									]))
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(daily.weekday)
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$classList(
+								_List_fromArray(
+									[
+										_Utils_Tuple2('dailyContainer', true)
+									]))
+							]),
+						A2($elm$core$List$map, $author$project$Pages$DailyList$exerciseElement, daily.exercises)),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$classList(
+								_List_fromArray(
+									[
+										_Utils_Tuple2('fabs', true)
+									])),
+								$elm$html$Html$Events$onClick($author$project$Pages$DailyList$AddPlan)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('+')
+							]))
+					]));
+		default:
+			var detail = model.a;
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$classList(
+						_List_fromArray(
+							[
+								_Utils_Tuple2('detailContainer', true)
+							]))
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text(detail.name)
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text(detail.description)
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text(
+								$elm$core$String$fromInt(detail.weight) + ' kg')
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$classList(
+								_List_fromArray(
+									[
+										_Utils_Tuple2('setContainer', true)
+									]))
+							]),
+						A2(
+							$elm$core$List$indexedMap,
+							$author$project$Pages$DailyList$createRepContainer,
+							A2($elm$core$List$repeat, detail.sets, detail))),
+						A2(
+						$elm$html$Html$textarea,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$placeholder('Note'),
+								$elm$html$Html$Attributes$disabled(detail.is_done)
+							]),
+						_List_Nil),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Events$onClick($author$project$Pages$DailyList$ViewList)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Go Back')
+							])),
+						detail.is_done ? A2($elm$html$Html$div, _List_Nil, _List_Nil) : A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Events$onClick(
+								$author$project$Pages$DailyList$CreateExecution(detail))
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Complete')
+							]))
+					]));
+	}
+};
+var $author$project$Pages$Login$InputEmail = function (a) {
+	return {$: 'InputEmail', a: a};
+};
+var $author$project$Pages$Login$InputPassword = function (a) {
+	return {$: 'InputPassword', a: a};
+};
+var $author$project$Pages$Login$Login = {$: 'Login'};
+var $elm$html$Html$form = _VirtualDom_node('form');
+var $author$project$Pages$Login$view = function (model) {
 	return A2(
 		$elm$html$Html$form,
 		_List_Nil,
@@ -6322,7 +7476,7 @@ var $author$project$Login$view = function (model) {
 					[
 						$elm$html$Html$Attributes$placeholder('email'),
 						$elm$html$Html$Attributes$type_('email'),
-						$elm$html$Html$Events$onInput($author$project$Login$InputEmail),
+						$elm$html$Html$Events$onInput($author$project$Pages$Login$InputEmail),
 						$elm$html$Html$Attributes$value(model.email)
 					]),
 				_List_Nil),
@@ -6332,7 +7486,7 @@ var $author$project$Login$view = function (model) {
 					[
 						$elm$html$Html$Attributes$placeholder('password'),
 						$elm$html$Html$Attributes$type_('password'),
-						$elm$html$Html$Events$onInput($author$project$Login$InputPassword),
+						$elm$html$Html$Events$onInput($author$project$Pages$Login$InputPassword),
 						$elm$html$Html$Attributes$value(model.password)
 					]),
 				_List_Nil),
@@ -6340,7 +7494,7 @@ var $author$project$Login$view = function (model) {
 				$elm$html$Html$button,
 				_List_fromArray(
 					[
-						$elm$html$Html$Events$onClick($author$project$Login$Login)
+						$elm$html$Html$Events$onClick($author$project$Pages$Login$Login)
 					]),
 				_List_fromArray(
 					[
@@ -6348,7 +7502,354 @@ var $author$project$Login$view = function (model) {
 					]))
 			]));
 };
-var $author$project$Login$main = $elm$browser$Browser$element(
-	{init: $author$project$Login$init, subscriptions: $author$project$Login$subscriptions, update: $author$project$Login$update, view: $author$project$Login$view});
-_Platform_export({'Login':{'init':$author$project$Login$main(
+var $author$project$Pages$Plan$AddWeekday = function (a) {
+	return {$: 'AddWeekday', a: a};
+};
+var $author$project$Pages$Plan$InputDescription = function (a) {
+	return {$: 'InputDescription', a: a};
+};
+var $author$project$Pages$Plan$InputMaxRep = function (a) {
+	return {$: 'InputMaxRep', a: a};
+};
+var $author$project$Pages$Plan$InputMaxSet = function (a) {
+	return {$: 'InputMaxSet', a: a};
+};
+var $author$project$Pages$Plan$InputMinRep = function (a) {
+	return {$: 'InputMinRep', a: a};
+};
+var $author$project$Pages$Plan$InputMinSet = function (a) {
+	return {$: 'InputMinSet', a: a};
+};
+var $author$project$Pages$Plan$InputName = function (a) {
+	return {$: 'InputName', a: a};
+};
+var $author$project$Pages$Plan$InputWeight = function (a) {
+	return {$: 'InputWeight', a: a};
+};
+var $author$project$Pages$Plan$InputWeightStep = function (a) {
+	return {$: 'InputWeightStep', a: a};
+};
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$html$Html$option = _VirtualDom_node('option');
+var $author$project$Pages$Plan$RemoveWeekday = function (a) {
+	return {$: 'RemoveWeekday', a: a};
+};
+var $author$project$Pages$Plan$removeWeekday = function (value) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$classList(
+				_List_fromArray(
+					[
+						_Utils_Tuple2('weekdays', true)
+					]))
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(value)
+					])),
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick(
+						$author$project$Pages$Plan$RemoveWeekday(value))
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('x')
+					]))
+			]));
+};
+var $elm$html$Html$select = _VirtualDom_node('select');
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $elm$core$List$member = F2(
+	function (x, xs) {
+		return A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a, x);
+			},
+			xs);
+	});
+var $author$project$Pages$Plan$weekdayOption = F2(
+	function (model, value) {
+		return A2(
+			$elm$html$Html$option,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$disabled(
+					A2($elm$core$List$member, value, model.weekday))
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text(value)
+				]));
+	});
+var $author$project$Pages$Plan$view = function (model) {
+	var content = _List_fromArray(
+		['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']);
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$classList(
+				_List_fromArray(
+					[
+						_Utils_Tuple2('planContainer', true)
+					]))
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$h2,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text('New Plan')
+					])),
+				A2(
+				$elm$html$Html$input,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$placeholder('Name'),
+						$elm$html$Html$Events$onInput($author$project$Pages$Plan$InputName),
+						$elm$html$Html$Attributes$value(model.name)
+					]),
+				_List_Nil),
+				A2(
+				$elm$html$Html$input,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$placeholder('Description'),
+						$elm$html$Html$Events$onInput($author$project$Pages$Plan$InputDescription),
+						$elm$html$Html$Attributes$value(model.description)
+					]),
+				_List_Nil),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$select,
+						_List_fromArray(
+							[
+								$elm$html$Html$Events$onInput($author$project$Pages$Plan$AddWeekday)
+							]),
+						A2(
+							$elm$core$List$append,
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$option,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$value('')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Select one...')
+										]))
+								]),
+							A2(
+								$elm$core$List$map,
+								$author$project$Pages$Plan$weekdayOption(model),
+								content))),
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						A2($elm$core$List$map, $author$project$Pages$Plan$removeWeekday, model.weekday))
+					])),
+				A2(
+				$elm$html$Html$input,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$placeholder('Min rep'),
+						$elm$html$Html$Events$onInput($author$project$Pages$Plan$InputMinRep),
+						$elm$html$Html$Attributes$type_('number'),
+						$elm$html$Html$Attributes$value(
+						$elm$core$String$fromInt(model.min_reps))
+					]),
+				_List_Nil),
+				A2(
+				$elm$html$Html$input,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$placeholder('Max rep'),
+						$elm$html$Html$Events$onInput($author$project$Pages$Plan$InputMaxRep),
+						$elm$html$Html$Attributes$type_('number'),
+						$elm$html$Html$Attributes$value(
+						$elm$core$String$fromInt(model.max_reps))
+					]),
+				_List_Nil),
+				A2(
+				$elm$html$Html$input,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$placeholder('Min set'),
+						$elm$html$Html$Events$onInput($author$project$Pages$Plan$InputMinSet),
+						$elm$html$Html$Attributes$type_('number'),
+						$elm$html$Html$Attributes$value(
+						$elm$core$String$fromInt(model.min_sets))
+					]),
+				_List_Nil),
+				A2(
+				$elm$html$Html$input,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$placeholder('Max set'),
+						$elm$html$Html$Events$onInput($author$project$Pages$Plan$InputMaxSet),
+						$elm$html$Html$Attributes$type_('number'),
+						$elm$html$Html$Attributes$value(
+						$elm$core$String$fromInt(model.max_sets))
+					]),
+				_List_Nil),
+				A2(
+				$elm$html$Html$input,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$placeholder('Weight'),
+						$elm$html$Html$Events$onInput($author$project$Pages$Plan$InputWeight),
+						$elm$html$Html$Attributes$type_('number'),
+						$elm$html$Html$Attributes$value(
+						$elm$core$String$fromInt(model.weight))
+					]),
+				_List_Nil),
+				A2(
+				$elm$html$Html$input,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$placeholder('Weight step'),
+						$elm$html$Html$Events$onInput($author$project$Pages$Plan$InputWeightStep),
+						$elm$html$Html$Attributes$type_('number'),
+						$elm$html$Html$Attributes$value(
+						$elm$core$String$fromInt(model.weight_step))
+					]),
+				_List_Nil),
+				A2(
+				$elm$html$Html$a,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$href('/')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Go Back')
+					])),
+				A2(
+				$elm$html$Html$button,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Save')
+					]))
+			]));
+};
+var $author$project$Main$view = function (model) {
+	return {
+		body: function () {
+			var _v0 = model.page;
+			switch (_v0.$) {
+				case 'LoginPage':
+					var login = _v0.a;
+					return _List_fromArray(
+						[
+							A2(
+							$elm$html$Html$map,
+							$author$project$Main$LoginMsg,
+							$author$project$Pages$Login$view(login.a))
+						]);
+				case 'DailyPage':
+					var daily = _v0.a;
+					return _List_fromArray(
+						[
+							A2(
+							$elm$html$Html$map,
+							$author$project$Main$DailyMsg,
+							$author$project$Pages$DailyList$view(daily.a))
+						]);
+				case 'PlanPage':
+					var plan = _v0.a;
+					return _List_fromArray(
+						[
+							A2(
+							$elm$html$Html$map,
+							$author$project$Main$PlanMsg,
+							$author$project$Pages$Plan$view(plan.a))
+						]);
+				default:
+					return _List_fromArray(
+						[
+							A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$classList(
+									_List_fromArray(
+										[
+											_Utils_Tuple2('error', true)
+										]))
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('404 Not found')
+								])),
+							A2(
+							$elm$html$Html$a,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$classList(
+									_List_fromArray(
+										[
+											_Utils_Tuple2('btnReturn', true)
+										])),
+									$elm$html$Html$Attributes$href('/')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Return home')
+								]))
+						]);
+			}
+		}(),
+		title: 'URL Interceptor'
+	};
+};
+var $author$project$Main$main = $elm$browser$Browser$application(
+	{init: $author$project$Main$init, onUrlChange: $author$project$Main$UrlChanged, onUrlRequest: $author$project$Main$LinkClicked, subscriptions: $author$project$Main$subscriptions, update: $author$project$Main$update, view: $author$project$Main$view});
+_Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$succeed(_Utils_Tuple0))(0)}});}(this));

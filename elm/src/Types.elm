@@ -12,6 +12,7 @@ type alias ExercisePlan =
   { id_plan: Maybe Int
   , name: String
   , description: String
+  , weekday: List String
   , min_reps: Int
   , max_reps: Int
   , min_sets: Int
@@ -32,6 +33,14 @@ type alias Exercise =
   , done_reps: List Int
   }
 
+encodePlan : ExercisePlan -> JE.value
+encodePlan plan =
+    JE.object
+        [ ( "id_plan", JE.int <| Maybe.withDefault -1 plan.id_plan )
+        , ( "name", JE.string plan.name)
+        , ( "description", JE.string plan.description)
+        , ( "reps", JE.list JE.int plan.done_reps )
+        ]
 exerciseDecoder : Decoder Exercise
 exerciseDecoder =
     JD.succeed Exercise

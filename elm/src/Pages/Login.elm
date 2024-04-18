@@ -6,26 +6,26 @@ import Html exposing (Html, div, button, input, text, form, h2)
 import Browser
 import Browser.Navigation as Nav
 import Http
-import Json.Encode as JE 
+import Json.Encode as JE
 
 endpoint : String
 endpoint = "http://192.168.0.194:8080"
 
-type alias Model = 
+type alias Model =
     { email: String
     , password: String
     , error: Maybe String
     }
 
 type Msg
-    = Login 
+    = Login
     | GotNewSession (Result Http.Error ())
     | InputEmail String
     | InputPassword String
 
 encodeCredentials : Model -> JE.Value
 encodeCredentials credentials =
-    JE.object 
+    JE.object
         [ ( "email", JE.string credentials.email )
         , ( "password", JE.string credentials.password )
         ]
@@ -41,25 +41,25 @@ getNewSession model =
     , body = Http.jsonBody (encodeCredentials model)
     , timeout = Nothing
     , tracker = Nothing
-    , expect = Http.expectWhatever GotNewSession 
+    , expect = Http.expectWhatever GotNewSession
     }
 
 init : () -> (Model, Cmd Msg)
-init _ = 
+init _ =
     ({ email = ""
     , password = ""
-    , error = Nothing 
+    , error = Nothing
     }
     , Cmd.none
     )
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
-    case msg of 
+    case msg of
         Login ->
             (model, getNewSession model)
         GotNewSession result ->
-            case result of 
+            case result of
                 Ok _ ->
                     (model, Nav.load "app/")
                 Err err ->
@@ -72,21 +72,22 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-   form [] 
-    [ h2 [] [ text "Training" ] 
-    , input 
+   form []
+    [ h2 [] [ text "Training" ]
+    , input
         [ placeholder "email"
         , type_ "email"
         , onInput InputEmail
-        , value model.email 
+        , value model.email
         ] []
-    , input 
+    , input
         [ placeholder "password"
         , type_ "password"
         , onInput InputPassword
-        , value model.password 
+        , value model.password
         ] []
     , button [ onClick Login ] [ text "Login" ]
-    ] 
+    ]
+
 
 

@@ -4,6 +4,7 @@ use std::path::{PathBuf, Path};
 use auth::types::isAuth;
 use rocket::Request;
 use rocket::fairing::AdHoc;
+use rocket::form::validate::Contains;
 use rocket::http::{Cookie, Header};
 use rocket::response::Redirect;
 use rocket_db_pools::Database;
@@ -19,16 +20,17 @@ use exercises::*;
 fn ping() -> String {
     "pong".to_string()
 }
-#[get("/app/<path..>")]
-pub async fn file_serve(path: PathBuf, auth: isAuth) -> Option<NamedFile> {
-    debug!("{:?}", path);
-    let mut path = Path::new(relative!("pages/app/")).join(path);
-    let mut path = Path::new(relative!("test/")).join(path);
-    if path.is_dir() {
+#[get("/<path..>")]
+pub async fn file_serve(path: PathBuf) -> Option<NamedFile> {
+    if path.to_str().contains(".") {
+        let path = Path::new(relative!("static/")).join(path);
+        NamedFile::open(path).await.ok()
+    } else {
+        let mut path = Path::new(relative!("static/")).join("");
         path.push("index.html");
-    }
 
-    NamedFile::open(path).await.ok()
+        NamedFile::open(path).await.ok()
+    }
 }
 #[options("/<_..>")]
 fn request_roll_preflight() {}
@@ -59,10 +61,8 @@ fn rocket() -> _ {
                insert_plan,
                insert_execution,
                get_daily,
-               //file_serve 
+               file_serve 
         ])
-        //.mount("/login", FileServer::from(relative!("pages/login/")))
-        .mount("/", FileServer::from(relative!("static/")))
         .register("/", catchers![unauthorized])
             
 }
