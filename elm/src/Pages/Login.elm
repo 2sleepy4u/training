@@ -1,6 +1,6 @@
 module Pages.Login exposing (..)
 import Utility exposing (..)
-import Html.Attributes exposing (type_, classList, placeholder, value)
+import Html.Attributes exposing (type_, classList, placeholder, value, id)
 import Html.Events exposing (onClick, onInput)
 import Html exposing (Html, div, button, input, text, form, h2)
 import Browser
@@ -61,7 +61,7 @@ update msg model =
         GotNewSession result ->
             case result of
                 Ok _ ->
-                    (model, Nav.load "app/")
+                    (model, Nav.load "/")
                 Err err ->
                     ({ model | error = Just (httpErrorDecode err) }, Cmd.none)
         InputEmail email ->
@@ -72,7 +72,7 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-   form []
+    div [ id "loginForm"]
     [ h2 [] [ text "Training" ]
     , input
         [ placeholder "email"

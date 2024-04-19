@@ -21,6 +21,7 @@ pub struct Execution {
 #[derive(sqlx::FromRow, Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
 pub struct Plan {
+    pub id_plan: i32,
     pub name: String,
     pub description: String,
     pub min_reps: i32,
@@ -148,6 +149,7 @@ pub async fn insert_plan(
     mut db: Connection<Training>
 ) -> Status {
     let result = sqlx::query(INSERT_PLAN)
+        .bind(auth.id_user)
         .bind(&payload.name)
         .bind(&payload.description)
         .bind(&payload.min_reps)
@@ -157,7 +159,6 @@ pub async fn insert_plan(
         .bind(&payload.min_weight)
         .bind(&payload.weight_step)
         .bind(&payload.weekday)
-        .bind(&auth.ssid)
         .execute(&mut **db)
         .await;
 
@@ -206,8 +207,8 @@ pub async fn insert_execution (
 
 pub const INSERT_PLAN: &str = "
     INSERT INTO ExercisePlan 
-    (id_user, name, description, min_sets, max_sets, min_resp, max_resp, min_weight, weight_step, weekday) VALUES
-    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    (id_user, name, description, min_sets, max_sets, min_reps, max_reps, min_weight, weight_step, weekday) VALUES
+    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::Weekday[])
 ";
 pub const UPDATE_PLAN: &str = "
     UPDATE ExercisePlan 
@@ -215,8 +216,8 @@ pub const UPDATE_PLAN: &str = "
         description = $1,
         min_sets = $2,
         max_sets = $3, 
-        min_resp = $4, 
-        max_resp = $5, 
+        min_reps = $4, 
+        max_reps = $5, 
         min_weight = $6, 
         weight_step = $7,
         weekday = $8,

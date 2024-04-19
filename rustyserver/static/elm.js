@@ -6333,7 +6333,7 @@ var $author$project$Pages$Login$init = function (_v0) {
 };
 var $author$project$Pages$Plan$init = function (_v0) {
 	return _Utils_Tuple2(
-		{description: '', id_plan: $elm$core$Maybe$Nothing, max_reps: 0, max_sets: 0, min_reps: 0, min_sets: 0, name: '', weekday: _List_Nil, weight: 0, weight_step: 0},
+		{active: true, description: '', id_plan: $elm$core$Maybe$Nothing, max_reps: 0, max_sets: 0, min_reps: 0, min_sets: 0, name: '', weekday: _List_Nil, weight: 0, weight_step: 0},
 		$elm$core$Platform$Cmd$none);
 };
 var $author$project$Main$pathResolve = F2(
@@ -6353,14 +6353,14 @@ var $author$project$Main$pathResolve = F2(
 					A2($elm$core$Platform$Cmd$map, $author$project$Main$LoginMsg, cmd));
 			case '/':
 				var _v2 = $author$project$Pages$DailyList$init(_Utils_Tuple0);
-				var dailyModel = _v2.a;
+				var subModel = _v2.a;
 				var cmd = _v2.b;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
 							page: $author$project$Main$DailyPage(
-								_Utils_Tuple2(dailyModel, cmd))
+								_Utils_Tuple2(subModel, cmd))
 						}),
 					A2($elm$core$Platform$Cmd$map, $author$project$Main$DailyMsg, cmd));
 			case '/addPlan':
@@ -6554,23 +6554,6 @@ var $elm$core$Array$fromList = function (list) {
 		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
 	}
 };
-var $author$project$Utility$httpErrorDecode = function (err) {
-	switch (err.$) {
-		case 'BadUrl':
-			var txt = err.a;
-			return txt;
-		case 'Timeout':
-			return 'Timeout';
-		case 'NetworkError':
-			return 'NetworkError';
-		case 'BadStatus':
-			var status = err.a;
-			return 'Status';
-		default:
-			var txt = err.a;
-			return txt;
-	}
-};
 var $elm$core$Bitwise$and = _Bitwise_and;
 var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
 var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
@@ -6682,10 +6665,33 @@ var $author$project$Pages$DailyList$update = F2(
 							$elm$core$Platform$Cmd$none);
 					} else {
 						var err = result.a;
-						return _Utils_Tuple2(
-							$author$project$Pages$DailyList$Failure(
-								$author$project$Utility$httpErrorDecode(err)),
-							$elm$core$Platform$Cmd$none);
+						switch (err.$) {
+							case 'BadStatus':
+								var statusCode = err.a;
+								switch (statusCode) {
+									case 401:
+										return _Utils_Tuple2(
+											model,
+											$elm$browser$Browser$Navigation$load('/login'));
+									case 303:
+										return _Utils_Tuple2(
+											model,
+											$elm$browser$Browser$Navigation$load('/login'));
+									default:
+										return _Utils_Tuple2(
+											model,
+											$elm$browser$Browser$Navigation$load('/login'));
+								}
+							case 'BadBody':
+								var txt = err.a;
+								return _Utils_Tuple2(
+									model,
+									$elm$browser$Browser$Navigation$load('/login'));
+							default:
+								return _Utils_Tuple2(
+									$author$project$Pages$DailyList$Failure('error'),
+									$elm$core$Platform$Cmd$none);
+						}
 					}
 				case 'InsertExecutionStatus':
 					var result = msg.a;
@@ -6734,6 +6740,23 @@ var $author$project$Pages$Login$getNewSession = function (model) {
 			url: $author$project$Pages$Login$endpoint + '/get_new_session'
 		});
 };
+var $author$project$Utility$httpErrorDecode = function (err) {
+	switch (err.$) {
+		case 'BadUrl':
+			var txt = err.a;
+			return txt;
+		case 'Timeout':
+			return 'Timeout';
+		case 'NetworkError':
+			return 'NetworkError';
+		case 'BadStatus':
+			var status = err.a;
+			return 'Status';
+		default:
+			var txt = err.a;
+			return txt;
+	}
+};
 var $author$project$Pages$Login$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -6746,7 +6769,7 @@ var $author$project$Pages$Login$update = F2(
 				if (result.$ === 'Ok') {
 					return _Utils_Tuple2(
 						model,
-						$elm$browser$Browser$Navigation$load('app/'));
+						$elm$browser$Browser$Navigation$load('/'));
 				} else {
 					var err = result.a;
 					return _Utils_Tuple2(
@@ -6774,6 +6797,67 @@ var $author$project$Pages$Login$update = F2(
 					$elm$core$Platform$Cmd$none);
 		}
 	});
+var $author$project$Pages$Plan$InsertPlanStatus = function (a) {
+	return {$: 'InsertPlanStatus', a: a};
+};
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $author$project$Types$encodePlan = function (plan) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'id_plan',
+				$elm$json$Json$Encode$int(
+					A2($elm$core$Maybe$withDefault, -1, plan.id_plan))),
+				_Utils_Tuple2(
+				'name',
+				$elm$json$Json$Encode$string(plan.name)),
+				_Utils_Tuple2(
+				'description',
+				$elm$json$Json$Encode$string(plan.description)),
+				_Utils_Tuple2(
+				'weekday',
+				A2($elm$json$Json$Encode$list, $elm$json$Json$Encode$string, plan.weekday)),
+				_Utils_Tuple2(
+				'min_reps',
+				$elm$json$Json$Encode$int(plan.min_reps)),
+				_Utils_Tuple2(
+				'max_reps',
+				$elm$json$Json$Encode$int(plan.max_reps)),
+				_Utils_Tuple2(
+				'min_sets',
+				$elm$json$Json$Encode$int(plan.min_sets)),
+				_Utils_Tuple2(
+				'max_sets',
+				$elm$json$Json$Encode$int(plan.max_sets)),
+				_Utils_Tuple2(
+				'min_weight',
+				$elm$json$Json$Encode$int(plan.weight)),
+				_Utils_Tuple2(
+				'weight_step',
+				$elm$json$Json$Encode$int(plan.weight_step)),
+				_Utils_Tuple2(
+				'active',
+				$elm$json$Json$Encode$bool(plan.active))
+			]));
+};
+var $author$project$Pages$Plan$endpoint = 'http://192.168.0.194:8080';
+var $author$project$Pages$Plan$insertPlan = function (plan) {
+	return $elm$http$Http$riskyRequest(
+		{
+			body: $elm$http$Http$jsonBody(
+				$author$project$Types$encodePlan(plan)),
+			expect: $elm$http$Http$expectWhatever($author$project$Pages$Plan$InsertPlanStatus),
+			headers: _List_Nil,
+			method: 'post',
+			timeout: $elm$core$Maybe$Nothing,
+			tracker: $elm$core$Maybe$Nothing,
+			url: $author$project$Pages$Plan$endpoint + '/insert_plan'
+		});
+};
 var $elm$core$List$partition = F2(
 	function (pred, list) {
 		var step = F2(
@@ -6795,6 +6879,17 @@ var $elm$core$List$partition = F2(
 var $author$project$Pages$Plan$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
+			case 'InsertPlan':
+				return _Utils_Tuple2(
+					model,
+					$author$project$Pages$Plan$insertPlan(model));
+			case 'InsertPlanStatus':
+				var result = msg.a;
+				if (result.$ === 'Ok') {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				}
 			case 'InputName':
 				var value = msg.a;
 				return _Utils_Tuple2(
@@ -6886,7 +6981,7 @@ var $author$project$Pages$Plan$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 'AddWeekday':
 				var item = msg.a;
-				return _Utils_Tuple2(
+				return ($elm$core$String$length(item) > 0) ? _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
@@ -6895,16 +6990,16 @@ var $author$project$Pages$Plan$update = F2(
 								_List_fromArray(
 									[item]))
 						}),
-					$elm$core$Platform$Cmd$none);
+					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 			default:
 				var item = msg.a;
-				var _v1 = A2(
+				var _v2 = A2(
 					$elm$core$List$partition,
 					function (x) {
 						return _Utils_eq(x, item);
 					},
 					model.weekday);
-				var newSelected = _v1.b;
+				var newSelected = _v2.b;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -7065,7 +7160,6 @@ var $author$project$Pages$DailyList$InputRep = F2(
 	function (a, b) {
 		return {$: 'InputRep', a: a, b: b};
 	});
-var $elm$json$Json$Encode$bool = _Json_wrap;
 var $elm$html$Html$Attributes$boolProperty = F2(
 	function (key, bool) {
 		return A2(
@@ -7456,11 +7550,14 @@ var $author$project$Pages$Login$InputPassword = function (a) {
 	return {$: 'InputPassword', a: a};
 };
 var $author$project$Pages$Login$Login = {$: 'Login'};
-var $elm$html$Html$form = _VirtualDom_node('form');
+var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $author$project$Pages$Login$view = function (model) {
 	return A2(
-		$elm$html$Html$form,
-		_List_Nil,
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$id('loginForm')
+			]),
 		_List_fromArray(
 			[
 				A2(
@@ -7529,6 +7626,7 @@ var $author$project$Pages$Plan$InputWeight = function (a) {
 var $author$project$Pages$Plan$InputWeightStep = function (a) {
 	return {$: 'InputWeightStep', a: a};
 };
+var $author$project$Pages$Plan$InsertPlan = {$: 'InsertPlan'};
 var $elm$core$List$append = F2(
 	function (xs, ys) {
 		if (!ys.b) {
@@ -7772,7 +7870,10 @@ var $author$project$Pages$Plan$view = function (model) {
 					])),
 				A2(
 				$elm$html$Html$button,
-				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick($author$project$Pages$Plan$InsertPlan)
+					]),
 				_List_fromArray(
 					[
 						$elm$html$Html$text('Save')

@@ -1,4 +1,5 @@
 use rocket::http::{CookieJar, Cookie, Status};
+use rocket::response::Redirect;
 use rocket::serde::json::Json;
 use rocket_db_pools::{Database, Connection};
 use rocket_db_pools::sqlx::{self, Row};
@@ -25,7 +26,7 @@ pub async fn get_new_session(
     payload: Json<UserCredentials>, 
     cookies: &CookieJar<'_>,
     mut db: Connection<Training>
-) -> Status 
+) -> Status //Result<Redirect, Status>
 {
     let email = &payload.email;
     let password = &payload.password;
@@ -40,7 +41,8 @@ pub async fn get_new_session(
             row
         } else {
             error!("No user found or wrong credential");
-            return Status::Unauthorized
+            //return Result::Err(Status::Unauthorized)
+            return Status::ImATeapot
         };
 
     let token = 
@@ -56,7 +58,8 @@ pub async fn get_new_session(
 
             if let Err(e) = result {
                 error!("Errore nella creazione della nuova sessione: {}", e);
-                return Status::Unauthorized
+                return Status::ImATeapot
+                //return Result::Err(Status::Unauthorized)
             };
             token
         };
@@ -64,5 +67,6 @@ pub async fn get_new_session(
         .path("/");
     cookies.add(ssid);
 
+    //Result::Ok(Redirect::to(uri!("/")))
     Status::Ok
 }

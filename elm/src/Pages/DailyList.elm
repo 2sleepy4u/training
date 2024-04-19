@@ -103,7 +103,19 @@ update msg model =
         Ok daily ->
           (ExerciseList daily, Cmd.none)
         Err err ->
-          (Failure (httpErrorDecode err), Cmd.none)
+            case err of
+                Http.BadStatus statusCode  ->
+                    case statusCode of
+                        401 ->
+                            (model, Nav.load "/login")
+                        303 ->
+                            (model, Nav.load "/login")
+                        _ ->
+                            (Failure "error", Cmd.none)
+                Http.BadBody txt -> 
+                    (model, Nav.load "/login")
+                _ -> 
+                    (Failure "error", Cmd.none)
     InsertExecutionStatus result ->
       case result of
         Ok _ ->

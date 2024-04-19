@@ -19,6 +19,7 @@ type alias ExercisePlan =
   , max_sets: Int
   , weight: Int
   , weight_step: Int
+  , active: Bool
   }
 
 type alias Exercise = 
@@ -33,14 +34,22 @@ type alias Exercise =
   , done_reps: List Int
   }
 
-encodePlan : ExercisePlan -> JE.value
+encodePlan : ExercisePlan -> JE.Value
 encodePlan plan =
     JE.object
         [ ( "id_plan", JE.int <| Maybe.withDefault -1 plan.id_plan )
         , ( "name", JE.string plan.name)
         , ( "description", JE.string plan.description)
-        , ( "reps", JE.list JE.int plan.done_reps )
+        , ( "weekday", JE.list JE.string plan.weekday )
+        , ( "min_reps", JE.int plan.min_reps )
+        , ( "max_reps", JE.int plan.max_reps )
+        , ( "min_sets", JE.int plan.min_sets )
+        , ( "max_sets", JE.int plan.max_sets )
+        , ( "min_weight", JE.int plan.weight )
+        , ( "weight_step", JE.int plan.weight_step )
+        , ( "active", JE.bool plan.active )
         ]
+
 exerciseDecoder : Decoder Exercise
 exerciseDecoder =
     JD.succeed Exercise

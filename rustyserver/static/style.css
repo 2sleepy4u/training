@@ -5,7 +5,7 @@ html, body {
     overflow: hidden;
 }
 
-form {
+#loginForm {
     text-align: center;
     border: 1px solid;
     border-radius: 15px;
@@ -19,12 +19,12 @@ form {
     transform: translate(-50%, -50%);
 }
 
-form h2 {
+#loginForm h2 {
     padding-top: 12%;
     padding-bottom: 12%;
 }
 
-form input {
+#loginForm input {
     font-size: inherit;
     background-color: inherit;
     color:inherit;
@@ -40,7 +40,7 @@ form input {
     margin-bottom: 10px;
 }
 
-form button {
+#loginForm button {
     height: 50px;
     width: 50%;
 
@@ -50,6 +50,58 @@ form button {
     background-color: inherit;
 
     margin-top: 20%;
+}
+
+.planContainer input {
+    font-size: inherit;
+    background-color: inherit;
+    color:inherit;
+
+    border: 1px solid;
+    border-radius: 15px;
+    padding: 8px;
+
+    display: block;
+    margin: auto;
+
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.planContainer select {
+    font-size: inherit;
+    background-color: inherit;
+    color:inherit;
+
+    border: 1px solid;
+    border-radius: 15px;
+    padding: 8px;
+
+    display: block;
+    margin: auto;
+
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.planContainer button:not(.weekdays * ) {
+    height: 50px;
+    width: 50%;
+
+    border: 1px solid;
+    border-radius: 15px;
+    color:inherit;
+    background-color: inherit;
+
+    margin-top: 20%;
+}
+
+button:is(.weekdays * ) {
+    border: 1px solid;
+    border-radius: 15px;
+    color:inherit;
+    background-color: inherit;
+
 }
 
 .loading {

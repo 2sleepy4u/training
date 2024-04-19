@@ -104,9 +104,9 @@ pathResolve model path =
             ({model | page = LoginPage (subModel, cmd) } , Cmd.map LoginMsg cmd)
         "/" ->
             let 
-                (dailyModel, cmd) = Daily.init ()
+                (subModel, cmd) = Daily.init ()
             in
-            ({model | page = DailyPage (dailyModel, cmd) } , Cmd.map DailyMsg cmd)
+            ({model | page = DailyPage (subModel, cmd) } , Cmd.map DailyMsg cmd)
         "/addPlan" -> 
             let 
                 (subModel, cmd) = Plan.init ()
