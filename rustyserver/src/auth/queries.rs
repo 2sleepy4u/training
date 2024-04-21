@@ -1,35 +1,39 @@
 pub const NEW_SESSION_QUERY: &str = "
-    INSERT INTO Sessions 
+    INSERT INTO Sessions
     (ssid, id_user, creation_date) VALUES
     ($1, $2, CURRENT_DATE)
 ";
 
 pub const CHECK_SESSION: &str = "
    SELECT
-        S.id_user,
-        S.SSID
-    FROM 
-        Sessions S LEFT JOIN LATERAL
-        GeneralParams P ON true
-    WHERE 
-        S.SSID = $1 AND U.active = true
-    AND CURRENT_DATE <= S.creation_date + P.session_duration   
+        U.id_user,
+        SS.SSID
+    FROM
+        Users U LEFT JOIN (
+                Sessions S INNER JOIN
+                GeneralParams P ON CURRENT_DATE <= S.creation_date + P.session_duration
+                ) SS ON U.id_user = SS.id_user
+    WHERE
+        SS.SSID = $1 AND U.active = true
     LIMIT 1
 ";
 
 
 pub const CHECK_USER_QUERY: &str = "
-    SELECT
+   SELECT
         U.id_user,
-        S.SSID
-    FROM 
-        Users U LEFT JOIN
-        Sessions S ON U.id_utente = S.id_utente LEFT JOIN LATERAL
-        GeneralParams P ON true
-    WHERE 
+        SS.SSID
+    FROM
+        Users U LEFT JOIN (
+                Sessions S INNER JOIN
+                GeneralParams P ON CURRENT_DATE <= S.creation_date + P.session_duration
+                ) SS ON U.id_user = SS.id_user
+    WHERE
         U.email = $1 AND U.password = $2 AND U.active = true
-    AND CURRENT_DATE <= S.creation_date + P.session_duration   
-    LIMIT 1
+
+        ORDER BY SS.creation_date DESC
+   LIMIT 1
+
 ";
 
 

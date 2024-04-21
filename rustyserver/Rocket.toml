@@ -5,5 +5,3 @@ port = 8080
 [default.databases.training]
 url="postgres://postgres:postgres@localhost/training"
 
-[default.databases.m2m]
-url="mysql://prova:prova@localhost/m2m"

@@ -9,7 +9,7 @@
         name = {$page.state.name}
         sets = {$page.state.sets}
         reps = {$page.state.reps}
-        isDone = {$page.state.isDone}
+        isDone = {$page.state.is_done}
         description = {$page.state.description}
     />
 {:else }

@@ -1,7 +1,10 @@
+use std::str::FromStr;
+
 use rocket_db_pools::{sqlx::Row, Connection};
 use rocket::request::{FromRequest, Outcome, Request};
 use rocket::http::Status;
 use rocket::serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 use super::queries::*;
 use super::routes::*;
@@ -13,10 +16,10 @@ pub struct UserCredentials {
     pub password: String
 }
 
-#[derive(sqlx::FromRow)]
+#[derive(sqlx::FromRow, Debug)]
 pub struct isAuth {
-    pub token: String,
-    pub id_user: i32
+    pub id_user: i32,
+    pub ssid: Uuid
 }
 
 #[derive(Debug)]
@@ -34,9 +37,17 @@ impl<'r> FromRequest<'r> for isAuth {
         let ssid: &str = req.cookies().get("SSID")
             .map_or("", |cookie| cookie.value());
 
+        debug!("AUTH SSID is {}", ssid);
+
         if ssid.is_empty() {
             return Outcome::Error((Status::Unauthorized, AuthStatus::Unauthorized));
         }
+
+        let ssid = 
+            match Uuid::from_str(ssid) {
+                Ok(value) => value,
+                Err(e) => panic!("{}", e)
+            };
         let mut db: Connection<Training> = match req.guard::<Connection<Training>>().await {
             rocket::outcome::Outcome::Success(a) => a,
             _ => panic!("Cannot retrive Connection Pool to Training dataBase from authentication middleware")
@@ -47,6 +58,7 @@ impl<'r> FromRequest<'r> for isAuth {
             .fetch_optional(&mut **db)
             .await;
 
+        warn!("{:?}", row);
         if let Ok(Some(is_auth)) = row {
             Outcome::Success(is_auth)
         } else {

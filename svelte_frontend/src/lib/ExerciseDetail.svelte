@@ -1,4 +1,5 @@
 <script>
+    import {validate, endpoints, getPostFetchOptions} from "$lib/index.js"
     export const ExerciseDetail = this
     export let name = "(No Name)"
     export let description = ""
@@ -9,6 +10,10 @@
     let note = ""
 
     async function SaveExecution() {
+        let elements = Array.from(document.querySelectorAll('.validate'));
+        if(validate(elements).length > 0)
+            return alert("Compilare correttamente tutti i campi richiesti")
+
         const data = {
             name, 
             description,
@@ -16,24 +21,28 @@
             reps,
         }
         try {
-            await fetch("/save_execution", {method: "POST", body: JSON.stringify(data)})
-        } catch(e) {}
+            await fetch(endpoints.insert_execution, getPostFetchOptions(data))
+        } catch(e) {
+            alert("Errore nel salvataggio")
+        }
     }
 
  </script>
 <div id = "exerciseDetail">
     <h2>{name}</h2>
     <br>
-    <span>{description}</span>
+    <span id="description">{description}</span>
     <br>
     {#each Array(Number(sets)) as _, i}
-        <div>
+        <div id="sets">
             <input 
-                bind:value={repsDone[i]}
+                bind:value = {repsDone[i]}
+                type = "number"
                 min = 0
                 max = {reps}
                 disabled = {isDone}
                 placeholder = 0 
+                class = "validate"
                 id = "repsInput"
             >
             /{reps}
@@ -47,13 +56,31 @@
     ></textarea>
     <br>
     {#if !isDone}
-        <button on:click={SaveExecution}>Fine</button>
+        <button id="save" on:click={SaveExecution}>Fine</button>
     {/if}
 </div>
 
 <style>
+
+    #save {
+        background-color: #181818;
+        color:inherit;
+        margin:auto;
+        border: 1px;
+    }
+    #sets {
+        font-size: x-large;
+    }
+    #description {
+        font-size: larger;
+    }
     #repsInput {
-        width: 20px;
+        width: 30px;
+        font-size: inherit;
+        background-color: inherit;
+        border: none;
+        border-bottom: 1px solid;
+        color:inherit;
     }
 
     #exerciseDetail {

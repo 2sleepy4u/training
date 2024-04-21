@@ -8,7 +8,7 @@
 <div 
     id = "exerciseCard" 
     on:click
-    class = {isDone ? "done" : ""}
+    class = {isDone ? "done" : "todo"}
 >
     {name}
     <br>
@@ -26,9 +26,14 @@
         margin: 10px;
 
         text-align: center;
+
+    }
+
+    .todo {
+        background-color: #131518;
     }
 
     .done {
-        background-color: green;
+        background-color: #2e7d32;
     }
 </style>
