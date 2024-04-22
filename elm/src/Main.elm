@@ -5,7 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Url
 import Pages.Login as Login
-import Pages.Plan as Plan
+import Pages.PlanList as Plan
 import Pages.DailyList as Daily exposing (..)
 
 
@@ -75,6 +75,12 @@ view : Model -> Browser.Document Msg
 view model =
   { title = "URL Interceptor"
   , body =
+      [ div [ id "bottomNav" ] 
+        [ a [ href "/" ] [ text "Daily" ]
+        , a [ href "/planList" ] [ text "Plan List" ]
+        , a [ href "/history" ] [ text "History" ]
+        ]
+      ] ++
       case model.page of
           LoginPage login ->
               [ Login.view (Tuple.first login) |> Html.map LoginMsg ]
@@ -107,12 +113,11 @@ pathResolve model path =
                 (subModel, cmd) = Daily.init ()
             in
             ({model | page = DailyPage (subModel, cmd) } , Cmd.map DailyMsg cmd)
-        "/addPlan" -> 
+        "/planList" -> 
             let 
                 (subModel, cmd) = Plan.init ()
             in
             ({model | page = PlanPage (subModel, cmd) } , Cmd.map PlanMsg cmd)
-
         _ ->
             ({ model | page = NotFound }, Cmd.none)
 

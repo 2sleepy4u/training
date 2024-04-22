@@ -6331,10 +6331,100 @@ var $author$project$Pages$Login$init = function (_v0) {
 		{email: '', error: $elm$core$Maybe$Nothing, password: ''},
 		$elm$core$Platform$Cmd$none);
 };
-var $author$project$Pages$Plan$init = function (_v0) {
-	return _Utils_Tuple2(
-		{active: true, description: '', id_plan: $elm$core$Maybe$Nothing, max_reps: 0, max_sets: 0, min_reps: 0, min_sets: 0, name: '', weekday: _List_Nil, weight: 0, weight_step: 0},
-		$elm$core$Platform$Cmd$none);
+var $author$project$Pages$PlanList$Loading = {$: 'Loading'};
+var $author$project$Pages$PlanList$GotPlanList = function (a) {
+	return {$: 'GotPlanList', a: a};
+};
+var $author$project$Pages$PlanList$endpoint = 'http://192.168.0.194:8080';
+var $author$project$Types$ExercisePlan = function (id_plan) {
+	return function (name) {
+		return function (description) {
+			return function (weekday) {
+				return function (min_reps) {
+					return function (max_reps) {
+						return function (min_sets) {
+							return function (max_sets) {
+								return function (min_weight) {
+									return function (weight_step) {
+										return function (active) {
+											return {active: active, description: description, id_plan: id_plan, max_reps: max_reps, max_sets: max_sets, min_reps: min_reps, min_sets: min_sets, min_weight: min_weight, name: name, weekday: weekday, weight_step: weight_step};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var $elm$json$Json$Decode$maybe = function (decoder) {
+	return $elm$json$Json$Decode$oneOf(
+		_List_fromArray(
+			[
+				A2($elm$json$Json$Decode$map, $elm$core$Maybe$Just, decoder),
+				$elm$json$Json$Decode$succeed($elm$core$Maybe$Nothing)
+			]));
+};
+var $author$project$Types$planDecoder = A3(
+	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+	'active',
+	$elm$json$Json$Decode$bool,
+	A3(
+		$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+		'weight_step',
+		$elm$json$Json$Decode$int,
+		A3(
+			$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+			'min_weight',
+			$elm$json$Json$Decode$int,
+			A3(
+				$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+				'max_sets',
+				$elm$json$Json$Decode$int,
+				A3(
+					$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+					'min_sets',
+					$elm$json$Json$Decode$int,
+					A3(
+						$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+						'max_reps',
+						$elm$json$Json$Decode$int,
+						A3(
+							$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+							'min_reps',
+							$elm$json$Json$Decode$int,
+							A3(
+								$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+								'weekday',
+								$elm$json$Json$Decode$list($elm$json$Json$Decode$string),
+								A3(
+									$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+									'description',
+									$elm$json$Json$Decode$string,
+									A3(
+										$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+										'name',
+										$elm$json$Json$Decode$string,
+										A3(
+											$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+											'id_plan',
+											$elm$json$Json$Decode$maybe($elm$json$Json$Decode$int),
+											$elm$json$Json$Decode$succeed($author$project$Types$ExercisePlan))))))))))));
+var $author$project$Types$planListDecoder = $elm$json$Json$Decode$list($author$project$Types$planDecoder);
+var $author$project$Pages$PlanList$getPlanList = $elm$http$Http$riskyRequest(
+	{
+		body: $elm$http$Http$emptyBody,
+		expect: A2($elm$http$Http$expectJson, $author$project$Pages$PlanList$GotPlanList, $author$project$Types$planListDecoder),
+		headers: _List_Nil,
+		method: 'get',
+		timeout: $elm$core$Maybe$Nothing,
+		tracker: $elm$core$Maybe$Nothing,
+		url: $author$project$Pages$PlanList$endpoint + '/get_plan_list'
+	});
+var $author$project$Pages$PlanList$init = function (_v0) {
+	return _Utils_Tuple2($author$project$Pages$PlanList$Loading, $author$project$Pages$PlanList$getPlanList);
 };
 var $author$project$Main$pathResolve = F2(
 	function (model, path) {
@@ -6363,8 +6453,8 @@ var $author$project$Main$pathResolve = F2(
 								_Utils_Tuple2(subModel, cmd))
 						}),
 					A2($elm$core$Platform$Cmd$map, $author$project$Main$DailyMsg, cmd));
-			case '/addPlan':
-				var _v3 = $author$project$Pages$Plan$init(_Utils_Tuple0);
+			case '/planList':
+				var _v3 = $author$project$Pages$PlanList$init(_Utils_Tuple0);
 				var subModel = _v3.a;
 				var cmd = _v3.b;
 				return _Utils_Tuple2(
@@ -6679,8 +6769,8 @@ var $author$project$Pages$DailyList$update = F2(
 											$elm$browser$Browser$Navigation$load('/login'));
 									default:
 										return _Utils_Tuple2(
-											model,
-											$elm$browser$Browser$Navigation$load('/login'));
+											$author$project$Pages$DailyList$Failure('error'),
+											$elm$core$Platform$Cmd$none);
 								}
 							case 'BadBody':
 								var txt = err.a;
@@ -6797,7 +6887,17 @@ var $author$project$Pages$Login$update = F2(
 					$elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$Pages$Plan$InsertPlanStatus = function (a) {
+var $author$project$Pages$PlanList$Failure = function (a) {
+	return {$: 'Failure', a: a};
+};
+var $author$project$Pages$PlanList$PlanDetail = function (a) {
+	return {$: 'PlanDetail', a: a};
+};
+var $author$project$Pages$PlanList$PlanList = function (a) {
+	return {$: 'PlanList', a: a};
+};
+var $author$project$Pages$PlanList$ViewList = {$: 'ViewList'};
+var $author$project$Pages$PlanList$InsertPlanStatus = function (a) {
 	return {$: 'InsertPlanStatus', a: a};
 };
 var $elm$json$Json$Encode$bool = _Json_wrap;
@@ -6835,7 +6935,7 @@ var $author$project$Types$encodePlan = function (plan) {
 				$elm$json$Json$Encode$int(plan.max_sets)),
 				_Utils_Tuple2(
 				'min_weight',
-				$elm$json$Json$Encode$int(plan.weight)),
+				$elm$json$Json$Encode$int(plan.min_weight)),
 				_Utils_Tuple2(
 				'weight_step',
 				$elm$json$Json$Encode$int(plan.weight_step)),
@@ -6844,18 +6944,17 @@ var $author$project$Types$encodePlan = function (plan) {
 				$elm$json$Json$Encode$bool(plan.active))
 			]));
 };
-var $author$project$Pages$Plan$endpoint = 'http://192.168.0.194:8080';
-var $author$project$Pages$Plan$insertPlan = function (plan) {
+var $author$project$Pages$PlanList$insertPlan = function (plan) {
 	return $elm$http$Http$riskyRequest(
 		{
 			body: $elm$http$Http$jsonBody(
 				$author$project$Types$encodePlan(plan)),
-			expect: $elm$http$Http$expectWhatever($author$project$Pages$Plan$InsertPlanStatus),
+			expect: $elm$http$Http$expectWhatever($author$project$Pages$PlanList$InsertPlanStatus),
 			headers: _List_Nil,
 			method: 'post',
 			timeout: $elm$core$Maybe$Nothing,
 			tracker: $elm$core$Maybe$Nothing,
-			url: $author$project$Pages$Plan$endpoint + '/insert_plan'
+			url: $author$project$Pages$PlanList$endpoint + '/insert_plan'
 		});
 };
 var $elm$core$List$partition = F2(
@@ -6876,135 +6975,195 @@ var $elm$core$List$partition = F2(
 			_Utils_Tuple2(_List_Nil, _List_Nil),
 			list);
 	});
-var $author$project$Pages$Plan$update = F2(
+var $author$project$Pages$PlanList$update = F2(
 	function (msg, model) {
-		switch (msg.$) {
-			case 'InsertPlan':
-				return _Utils_Tuple2(
-					model,
-					$author$project$Pages$Plan$insertPlan(model));
-			case 'InsertPlanStatus':
-				var result = msg.a;
-				if (result.$ === 'Ok') {
+		update:
+		while (true) {
+			switch (model.$) {
+				case 'Loading':
+					if (msg.$ === 'GotPlanList') {
+						var result = msg.a;
+						if (result.$ === 'Ok') {
+							var list = result.a;
+							return _Utils_Tuple2(
+								$author$project$Pages$PlanList$PlanList(list),
+								$elm$core$Platform$Cmd$none);
+						} else {
+							var err = result.a;
+							return _Utils_Tuple2(
+								$author$project$Pages$PlanList$Failure(
+									$author$project$Utility$httpErrorDecode(err)),
+								$elm$core$Platform$Cmd$none);
+						}
+					} else {
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					}
+				case 'PlanList':
+					var list = model.a;
+					switch (msg.$) {
+						case 'ViewDetail':
+							var plan = msg.a;
+							return _Utils_Tuple2(
+								$author$project$Pages$PlanList$PlanDetail(plan),
+								$elm$core$Platform$Cmd$none);
+						case 'InsertPlanStatus':
+							var result = msg.a;
+							if (result.$ === 'Ok') {
+								return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+							} else {
+								return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+							}
+						default:
+							return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					}
+				case 'PlanDetail':
+					var plan = model.a;
+					switch (msg.$) {
+						case 'ViewList':
+							return _Utils_Tuple2(model, $author$project$Pages$PlanList$getPlanList);
+						case 'InsertPlanStatus':
+							var result = msg.a;
+							if (result.$ === 'Ok') {
+								var $temp$msg = $author$project$Pages$PlanList$ViewList,
+									$temp$model = model;
+								msg = $temp$msg;
+								model = $temp$model;
+								continue update;
+							} else {
+								return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+							}
+						case 'InsertPlan':
+							return _Utils_Tuple2(
+								model,
+								$author$project$Pages$PlanList$insertPlan(plan));
+						case 'InputName':
+							var value = msg.a;
+							return _Utils_Tuple2(
+								$author$project$Pages$PlanList$PlanDetail(
+									_Utils_update(
+										plan,
+										{name: value})),
+								$elm$core$Platform$Cmd$none);
+						case 'InputDescription':
+							var value = msg.a;
+							return _Utils_Tuple2(
+								$author$project$Pages$PlanList$PlanDetail(
+									_Utils_update(
+										plan,
+										{description: value})),
+								$elm$core$Platform$Cmd$none);
+						case 'InputMinRep':
+							var value = msg.a;
+							return _Utils_Tuple2(
+								$author$project$Pages$PlanList$PlanDetail(
+									_Utils_update(
+										plan,
+										{
+											min_reps: A2(
+												$elm$core$Maybe$withDefault,
+												1,
+												$elm$core$String$toInt(value))
+										})),
+								$elm$core$Platform$Cmd$none);
+						case 'InputMaxRep':
+							var value = msg.a;
+							return _Utils_Tuple2(
+								$author$project$Pages$PlanList$PlanDetail(
+									_Utils_update(
+										plan,
+										{
+											max_reps: A2(
+												$elm$core$Maybe$withDefault,
+												1,
+												$elm$core$String$toInt(value))
+										})),
+								$elm$core$Platform$Cmd$none);
+						case 'InputMinSet':
+							var value = msg.a;
+							return _Utils_Tuple2(
+								$author$project$Pages$PlanList$PlanDetail(
+									_Utils_update(
+										plan,
+										{
+											min_sets: A2(
+												$elm$core$Maybe$withDefault,
+												1,
+												$elm$core$String$toInt(value))
+										})),
+								$elm$core$Platform$Cmd$none);
+						case 'InputMaxSet':
+							var value = msg.a;
+							return _Utils_Tuple2(
+								$author$project$Pages$PlanList$PlanDetail(
+									_Utils_update(
+										plan,
+										{
+											max_sets: A2(
+												$elm$core$Maybe$withDefault,
+												1,
+												$elm$core$String$toInt(value))
+										})),
+								$elm$core$Platform$Cmd$none);
+						case 'InputWeight':
+							var value = msg.a;
+							return _Utils_Tuple2(
+								$author$project$Pages$PlanList$PlanDetail(
+									_Utils_update(
+										plan,
+										{
+											min_weight: A2(
+												$elm$core$Maybe$withDefault,
+												1,
+												$elm$core$String$toInt(value))
+										})),
+								$elm$core$Platform$Cmd$none);
+						case 'InputWeightStep':
+							var value = msg.a;
+							return _Utils_Tuple2(
+								$author$project$Pages$PlanList$PlanDetail(
+									_Utils_update(
+										plan,
+										{
+											weight_step: A2(
+												$elm$core$Maybe$withDefault,
+												1,
+												$elm$core$String$toInt(value))
+										})),
+								$elm$core$Platform$Cmd$none);
+						case 'AddWeekday':
+							var item = msg.a;
+							return ($elm$core$String$length(item) > 0) ? _Utils_Tuple2(
+								$author$project$Pages$PlanList$PlanDetail(
+									_Utils_update(
+										plan,
+										{
+											weekday: _Utils_ap(
+												plan.weekday,
+												_List_fromArray(
+													[item]))
+										})),
+								$elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+						case 'RemoveWeekday':
+							var item = msg.a;
+							var _v7 = A2(
+								$elm$core$List$partition,
+								function (x) {
+									return _Utils_eq(x, item);
+								},
+								plan.weekday);
+							var newSelected = _v7.b;
+							return _Utils_Tuple2(
+								$author$project$Pages$PlanList$PlanDetail(
+									_Utils_update(
+										plan,
+										{weekday: newSelected})),
+								$elm$core$Platform$Cmd$none);
+						default:
+							return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					}
+				default:
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-				} else {
-					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-				}
-			case 'InputName':
-				var value = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{name: value}),
-					$elm$core$Platform$Cmd$none);
-			case 'InputDescription':
-				var value = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{description: value}),
-					$elm$core$Platform$Cmd$none);
-			case 'InputWeekday':
-				var weekday = msg.a;
-				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-			case 'InputMinRep':
-				var value = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							min_reps: A2(
-								$elm$core$Maybe$withDefault,
-								1,
-								$elm$core$String$toInt(value))
-						}),
-					$elm$core$Platform$Cmd$none);
-			case 'InputMaxRep':
-				var value = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							max_reps: A2(
-								$elm$core$Maybe$withDefault,
-								1,
-								$elm$core$String$toInt(value))
-						}),
-					$elm$core$Platform$Cmd$none);
-			case 'InputMinSet':
-				var value = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							min_sets: A2(
-								$elm$core$Maybe$withDefault,
-								1,
-								$elm$core$String$toInt(value))
-						}),
-					$elm$core$Platform$Cmd$none);
-			case 'InputMaxSet':
-				var value = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							max_sets: A2(
-								$elm$core$Maybe$withDefault,
-								1,
-								$elm$core$String$toInt(value))
-						}),
-					$elm$core$Platform$Cmd$none);
-			case 'InputWeight':
-				var value = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							weight: A2(
-								$elm$core$Maybe$withDefault,
-								1,
-								$elm$core$String$toInt(value))
-						}),
-					$elm$core$Platform$Cmd$none);
-			case 'InputWeightStep':
-				var value = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							weight_step: A2(
-								$elm$core$Maybe$withDefault,
-								1,
-								$elm$core$String$toInt(value))
-						}),
-					$elm$core$Platform$Cmd$none);
-			case 'AddWeekday':
-				var item = msg.a;
-				return ($elm$core$String$length(item) > 0) ? _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							weekday: _Utils_ap(
-								model.weekday,
-								_List_fromArray(
-									[item]))
-						}),
-					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-			default:
-				var item = msg.a;
-				var _v2 = A2(
-					$elm$core$List$partition,
-					function (x) {
-						return _Utils_eq(x, item);
-					},
-					model.weekday);
-				var newSelected = _v2.b;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{weekday: newSelected}),
-					$elm$core$Platform$Cmd$none);
+			}
 		}
 	});
 var $author$project$Main$update = F2(
@@ -7078,7 +7237,7 @@ var $author$project$Main$update = F2(
 					var page = _v8.a;
 					var _v9 = page;
 					var subModel = _v9.a;
-					var _v10 = A2($author$project$Pages$Plan$update, subMsg, subModel);
+					var _v10 = A2($author$project$Pages$PlanList$update, subMsg, subModel);
 					var newSubModel = _v10.a;
 					var cmd = _v10.b;
 					return _Utils_Tuple2(
@@ -7147,11 +7306,11 @@ var $elm$html$Html$Attributes$href = function (url) {
 		'href',
 		_VirtualDom_noJavaScriptUri(url));
 };
+var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
 var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $author$project$Pages$DailyList$AddPlan = {$: 'AddPlan'};
 var $author$project$Pages$DailyList$CreateExecution = function (a) {
 	return {$: 'CreateExecution', a: a};
 };
@@ -7444,22 +7603,7 @@ var $author$project$Pages$DailyList$view = function (model) {
 										_Utils_Tuple2('dailyContainer', true)
 									]))
 							]),
-						A2($elm$core$List$map, $author$project$Pages$DailyList$exerciseElement, daily.exercises)),
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$classList(
-								_List_fromArray(
-									[
-										_Utils_Tuple2('fabs', true)
-									])),
-								$elm$html$Html$Events$onClick($author$project$Pages$DailyList$AddPlan)
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('+')
-							]))
+						A2($elm$core$List$map, $author$project$Pages$DailyList$exerciseElement, daily.exercises))
 					]));
 		default:
 			var detail = model.a;
@@ -7550,7 +7694,6 @@ var $author$project$Pages$Login$InputPassword = function (a) {
 	return {$: 'InputPassword', a: a};
 };
 var $author$project$Pages$Login$Login = {$: 'Login'};
-var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $author$project$Pages$Login$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
@@ -7599,34 +7742,38 @@ var $author$project$Pages$Login$view = function (model) {
 					]))
 			]));
 };
-var $author$project$Pages$Plan$AddWeekday = function (a) {
+var $author$project$Pages$PlanList$AddWeekday = function (a) {
 	return {$: 'AddWeekday', a: a};
 };
-var $author$project$Pages$Plan$InputDescription = function (a) {
+var $author$project$Pages$PlanList$InputDescription = function (a) {
 	return {$: 'InputDescription', a: a};
 };
-var $author$project$Pages$Plan$InputMaxRep = function (a) {
+var $author$project$Pages$PlanList$InputMaxRep = function (a) {
 	return {$: 'InputMaxRep', a: a};
 };
-var $author$project$Pages$Plan$InputMaxSet = function (a) {
+var $author$project$Pages$PlanList$InputMaxSet = function (a) {
 	return {$: 'InputMaxSet', a: a};
 };
-var $author$project$Pages$Plan$InputMinRep = function (a) {
+var $author$project$Pages$PlanList$InputMinRep = function (a) {
 	return {$: 'InputMinRep', a: a};
 };
-var $author$project$Pages$Plan$InputMinSet = function (a) {
+var $author$project$Pages$PlanList$InputMinSet = function (a) {
 	return {$: 'InputMinSet', a: a};
 };
-var $author$project$Pages$Plan$InputName = function (a) {
+var $author$project$Pages$PlanList$InputName = function (a) {
 	return {$: 'InputName', a: a};
 };
-var $author$project$Pages$Plan$InputWeight = function (a) {
+var $author$project$Pages$PlanList$InputWeight = function (a) {
 	return {$: 'InputWeight', a: a};
 };
-var $author$project$Pages$Plan$InputWeightStep = function (a) {
+var $author$project$Pages$PlanList$InputWeightStep = function (a) {
 	return {$: 'InputWeightStep', a: a};
 };
-var $author$project$Pages$Plan$InsertPlan = {$: 'InsertPlan'};
+var $author$project$Pages$PlanList$InsertPlan = {$: 'InsertPlan'};
+var $author$project$Pages$PlanList$UpdatePlan = {$: 'UpdatePlan'};
+var $author$project$Pages$PlanList$ViewDetail = function (a) {
+	return {$: 'ViewDetail', a: a};
+};
 var $elm$core$List$append = F2(
 	function (xs, ys) {
 		if (!ys.b) {
@@ -7635,11 +7782,46 @@ var $elm$core$List$append = F2(
 			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
 		}
 	});
+var $elm$html$Html$Attributes$for = $elm$html$Html$Attributes$stringProperty('htmlFor');
+var $elm$html$Html$label = _VirtualDom_node('label');
+var $elm$html$Html$Attributes$name = $elm$html$Html$Attributes$stringProperty('name');
 var $elm$html$Html$option = _VirtualDom_node('option');
-var $author$project$Pages$Plan$RemoveWeekday = function (a) {
+var $author$project$Pages$PlanList$planDefault = {active: true, description: '', id_plan: $elm$core$Maybe$Nothing, max_reps: 0, max_sets: 0, min_reps: 0, min_sets: 0, min_weight: 0, name: '', weekday: _List_Nil, weight_step: 0};
+var $author$project$Pages$PlanList$planElement = function (plan) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Events$onClick(
+				$author$project$Pages$PlanList$ViewDetail(plan)),
+				$elm$html$Html$Attributes$classList(
+				_List_fromArray(
+					[
+						_Utils_Tuple2('exerciseElement', true)
+					]))
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(plan.name)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(plan.description)
+					]))
+			]));
+};
+var $author$project$Pages$PlanList$RemoveWeekday = function (a) {
 	return {$: 'RemoveWeekday', a: a};
 };
-var $author$project$Pages$Plan$removeWeekday = function (value) {
+var $author$project$Pages$PlanList$removeWeekday = function (value) {
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
@@ -7664,7 +7846,7 @@ var $author$project$Pages$Plan$removeWeekday = function (value) {
 				_List_fromArray(
 					[
 						$elm$html$Html$Events$onClick(
-						$author$project$Pages$Plan$RemoveWeekday(value))
+						$author$project$Pages$PlanList$RemoveWeekday(value))
 					]),
 				_List_fromArray(
 					[
@@ -7703,250 +7885,488 @@ var $elm$core$List$member = F2(
 			},
 			xs);
 	});
-var $author$project$Pages$Plan$weekdayOption = F2(
-	function (model, value) {
+var $author$project$Pages$PlanList$weekdayOption = F2(
+	function (plan, value) {
 		return A2(
 			$elm$html$Html$option,
 			_List_fromArray(
 				[
 					$elm$html$Html$Attributes$disabled(
-					A2($elm$core$List$member, value, model.weekday))
+					A2($elm$core$List$member, value, plan.weekday))
 				]),
 			_List_fromArray(
 				[
 					$elm$html$Html$text(value)
 				]));
 	});
-var $author$project$Pages$Plan$view = function (model) {
-	var content = _List_fromArray(
-		['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']);
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$classList(
+var $author$project$Pages$PlanList$view = function (model) {
+	switch (model.$) {
+		case 'Loading':
+			return A2(
+				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						_Utils_Tuple2('planContainer', true)
-					]))
-			]),
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$h2,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text('New Plan')
-					])),
-				A2(
-				$elm$html$Html$input,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$placeholder('Name'),
-						$elm$html$Html$Events$onInput($author$project$Pages$Plan$InputName),
-						$elm$html$Html$Attributes$value(model.name)
+						$elm$html$Html$Attributes$classList(
+						_List_fromArray(
+							[
+								_Utils_Tuple2('loading', true)
+							]))
 					]),
-				_List_Nil),
-				A2(
-				$elm$html$Html$input,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$placeholder('Description'),
-						$elm$html$Html$Events$onInput($author$project$Pages$Plan$InputDescription),
-						$elm$html$Html$Attributes$value(model.description)
-					]),
-				_List_Nil),
-				A2(
+						$elm$html$Html$text('Loading...')
+					]));
+		case 'Failure':
+			var err = model.a;
+			return A2(
 				$elm$html$Html$div,
 				_List_Nil,
 				_List_fromArray(
 					[
 						A2(
-						$elm$html$Html$select,
+						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Events$onInput($author$project$Pages$Plan$AddWeekday)
+								$elm$html$Html$Attributes$classList(
+								_List_fromArray(
+									[
+										_Utils_Tuple2('error', true)
+									]))
 							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Error!' + err)
+							])),
 						A2(
-							$elm$core$List$append,
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$option,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$value('')
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text('Select one...')
-										]))
-								]),
-							A2(
-								$elm$core$List$map,
-								$author$project$Pages$Plan$weekdayOption(model),
-								content))),
+						$elm$html$Html$a,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$href('/login')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Return to login page')
+							]))
+					]));
+		case 'PlanList':
+			var list = model.a;
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$classList(
+						_List_fromArray(
+							[
+								_Utils_Tuple2('dailyContainer', true)
+							]))
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$h2,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$classList(
+								_List_fromArray(
+									[
+										_Utils_Tuple2('title', true)
+									]))
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Plan List')
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$classList(
+								_List_fromArray(
+									[
+										_Utils_Tuple2('dailyContainer', true)
+									]))
+							]),
+						A2($elm$core$List$map, $author$project$Pages$PlanList$planElement, list)),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$classList(
+								_List_fromArray(
+									[
+										_Utils_Tuple2('fabs', true)
+									])),
+								$elm$html$Html$Events$onClick(
+								$author$project$Pages$PlanList$ViewDetail($author$project$Pages$PlanList$planDefault))
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('+')
+							]))
+					]));
+		default:
+			var detail = model.a;
+			var content = _List_fromArray(
+				['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']);
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$classList(
+						_List_fromArray(
+							[
+								_Utils_Tuple2('planContainer', true)
+							]))
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$h2,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('New Plan')
+							])),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$placeholder('Name'),
+								$elm$html$Html$Events$onInput($author$project$Pages$PlanList$InputName),
+								$elm$html$Html$Attributes$value(detail.name)
+							]),
+						_List_Nil),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$placeholder('Description'),
+								$elm$html$Html$Events$onInput($author$project$Pages$PlanList$InputDescription),
+								$elm$html$Html$Attributes$value(detail.description)
+							]),
+						_List_Nil),
 						A2(
 						$elm$html$Html$div,
 						_List_Nil,
-						A2($elm$core$List$map, $author$project$Pages$Plan$removeWeekday, model.weekday))
-					])),
-				A2(
-				$elm$html$Html$input,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$placeholder('Min rep'),
-						$elm$html$Html$Events$onInput($author$project$Pages$Plan$InputMinRep),
-						$elm$html$Html$Attributes$type_('number'),
-						$elm$html$Html$Attributes$value(
-						$elm$core$String$fromInt(model.min_reps))
-					]),
-				_List_Nil),
-				A2(
-				$elm$html$Html$input,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$placeholder('Max rep'),
-						$elm$html$Html$Events$onInput($author$project$Pages$Plan$InputMaxRep),
-						$elm$html$Html$Attributes$type_('number'),
-						$elm$html$Html$Attributes$value(
-						$elm$core$String$fromInt(model.max_reps))
-					]),
-				_List_Nil),
-				A2(
-				$elm$html$Html$input,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$placeholder('Min set'),
-						$elm$html$Html$Events$onInput($author$project$Pages$Plan$InputMinSet),
-						$elm$html$Html$Attributes$type_('number'),
-						$elm$html$Html$Attributes$value(
-						$elm$core$String$fromInt(model.min_sets))
-					]),
-				_List_Nil),
-				A2(
-				$elm$html$Html$input,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$placeholder('Max set'),
-						$elm$html$Html$Events$onInput($author$project$Pages$Plan$InputMaxSet),
-						$elm$html$Html$Attributes$type_('number'),
-						$elm$html$Html$Attributes$value(
-						$elm$core$String$fromInt(model.max_sets))
-					]),
-				_List_Nil),
-				A2(
-				$elm$html$Html$input,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$placeholder('Weight'),
-						$elm$html$Html$Events$onInput($author$project$Pages$Plan$InputWeight),
-						$elm$html$Html$Attributes$type_('number'),
-						$elm$html$Html$Attributes$value(
-						$elm$core$String$fromInt(model.weight))
-					]),
-				_List_Nil),
-				A2(
-				$elm$html$Html$input,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$placeholder('Weight step'),
-						$elm$html$Html$Events$onInput($author$project$Pages$Plan$InputWeightStep),
-						$elm$html$Html$Attributes$type_('number'),
-						$elm$html$Html$Attributes$value(
-						$elm$core$String$fromInt(model.weight_step))
-					]),
-				_List_Nil),
-				A2(
-				$elm$html$Html$a,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$href('/')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Go Back')
-					])),
-				A2(
-				$elm$html$Html$button,
-				_List_fromArray(
-					[
-						$elm$html$Html$Events$onClick($author$project$Pages$Plan$InsertPlan)
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Save')
-					]))
-			]));
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$select,
+								_List_fromArray(
+									[
+										$elm$html$Html$Events$onInput($author$project$Pages$PlanList$AddWeekday)
+									]),
+								A2(
+									$elm$core$List$append,
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$option,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$value('')
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text('Select one...')
+												]))
+										]),
+									A2(
+										$elm$core$List$map,
+										$author$project$Pages$PlanList$weekdayOption(detail),
+										content))),
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								A2($elm$core$List$map, $author$project$Pages$PlanList$removeWeekday, detail.weekday))
+							])),
+						A2(
+						$elm$html$Html$label,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$for('min_rep')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Min. reps')
+							])),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$name('min_rep'),
+								$elm$html$Html$Attributes$placeholder('Min rep'),
+								$elm$html$Html$Events$onInput($author$project$Pages$PlanList$InputMinRep),
+								$elm$html$Html$Attributes$type_('number'),
+								$elm$html$Html$Attributes$value(
+								$elm$core$String$fromInt(detail.min_reps))
+							]),
+						_List_Nil),
+						A2(
+						$elm$html$Html$label,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$for('max_rep')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Max. reps')
+							])),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$name('max_rep'),
+								$elm$html$Html$Attributes$placeholder('Max rep'),
+								$elm$html$Html$Events$onInput($author$project$Pages$PlanList$InputMaxRep),
+								$elm$html$Html$Attributes$type_('number'),
+								$elm$html$Html$Attributes$value(
+								$elm$core$String$fromInt(detail.max_reps))
+							]),
+						_List_Nil),
+						A2(
+						$elm$html$Html$label,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$for('min_set')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Min. sets')
+							])),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$name('min_set'),
+								$elm$html$Html$Attributes$placeholder('Min set'),
+								$elm$html$Html$Events$onInput($author$project$Pages$PlanList$InputMinSet),
+								$elm$html$Html$Attributes$type_('number'),
+								$elm$html$Html$Attributes$value(
+								$elm$core$String$fromInt(detail.min_sets))
+							]),
+						_List_Nil),
+						A2(
+						$elm$html$Html$label,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$for('max_set')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Max. sets')
+							])),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$name('max_set'),
+								$elm$html$Html$Attributes$placeholder('Max set'),
+								$elm$html$Html$Events$onInput($author$project$Pages$PlanList$InputMaxSet),
+								$elm$html$Html$Attributes$type_('number'),
+								$elm$html$Html$Attributes$value(
+								$elm$core$String$fromInt(detail.max_sets))
+							]),
+						_List_Nil),
+						A2(
+						$elm$html$Html$label,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$for('weight')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Weight')
+							])),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$name('weight'),
+								$elm$html$Html$Attributes$placeholder('Weight'),
+								$elm$html$Html$Events$onInput($author$project$Pages$PlanList$InputWeight),
+								$elm$html$Html$Attributes$type_('number'),
+								$elm$html$Html$Attributes$value(
+								$elm$core$String$fromInt(detail.min_weight))
+							]),
+						_List_Nil),
+						A2(
+						$elm$html$Html$label,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$for('weight_step')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Weight Increment')
+							])),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$name('weight_step'),
+								$elm$html$Html$Attributes$placeholder('Weight step'),
+								$elm$html$Html$Events$onInput($author$project$Pages$PlanList$InputWeightStep),
+								$elm$html$Html$Attributes$type_('number'),
+								$elm$html$Html$Attributes$value(
+								$elm$core$String$fromInt(detail.weight_step))
+							]),
+						_List_Nil),
+						A2(
+						$elm$html$Html$a,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$href('/'),
+								$elm$html$Html$Attributes$classList(
+								_List_fromArray(
+									[
+										_Utils_Tuple2('btnReturn', true)
+									]))
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Go Back')
+							])),
+						function () {
+						var _v1 = detail.id_plan;
+						if (_v1.$ === 'Just') {
+							var id = _v1.a;
+							return A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$elm$html$Html$Events$onClick($author$project$Pages$PlanList$UpdatePlan)
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Save')
+									]));
+						} else {
+							return A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$elm$html$Html$Events$onClick($author$project$Pages$PlanList$InsertPlan)
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Save')
+									]));
+						}
+					}()
+					]));
+	}
 };
 var $author$project$Main$view = function (model) {
 	return {
-		body: function () {
-			var _v0 = model.page;
-			switch (_v0.$) {
-				case 'LoginPage':
-					var login = _v0.a;
-					return _List_fromArray(
+		body: _Utils_ap(
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$id('bottomNav')
+						]),
+					_List_fromArray(
 						[
 							A2(
-							$elm$html$Html$map,
-							$author$project$Main$LoginMsg,
-							$author$project$Pages$Login$view(login.a))
-						]);
-				case 'DailyPage':
-					var daily = _v0.a;
-					return _List_fromArray(
-						[
-							A2(
-							$elm$html$Html$map,
-							$author$project$Main$DailyMsg,
-							$author$project$Pages$DailyList$view(daily.a))
-						]);
-				case 'PlanPage':
-					var plan = _v0.a;
-					return _List_fromArray(
-						[
-							A2(
-							$elm$html$Html$map,
-							$author$project$Main$PlanMsg,
-							$author$project$Pages$Plan$view(plan.a))
-						]);
-				default:
-					return _List_fromArray(
-						[
-							A2(
-							$elm$html$Html$div,
+							$elm$html$Html$a,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$classList(
-									_List_fromArray(
-										[
-											_Utils_Tuple2('error', true)
-										]))
+									$elm$html$Html$Attributes$href('/')
 								]),
 							_List_fromArray(
 								[
-									$elm$html$Html$text('404 Not found')
+									$elm$html$Html$text('Daily')
 								])),
 							A2(
 							$elm$html$Html$a,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$classList(
-									_List_fromArray(
-										[
-											_Utils_Tuple2('btnReturn', true)
-										])),
-									$elm$html$Html$Attributes$href('/')
+									$elm$html$Html$Attributes$href('/planList')
 								]),
 							_List_fromArray(
 								[
-									$elm$html$Html$text('Return home')
+									$elm$html$Html$text('Plan List')
+								])),
+							A2(
+							$elm$html$Html$a,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$href('/history')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('History')
 								]))
-						]);
-			}
-		}(),
+						]))
+				]),
+			function () {
+				var _v0 = model.page;
+				switch (_v0.$) {
+					case 'LoginPage':
+						var login = _v0.a;
+						return _List_fromArray(
+							[
+								A2(
+								$elm$html$Html$map,
+								$author$project$Main$LoginMsg,
+								$author$project$Pages$Login$view(login.a))
+							]);
+					case 'DailyPage':
+						var daily = _v0.a;
+						return _List_fromArray(
+							[
+								A2(
+								$elm$html$Html$map,
+								$author$project$Main$DailyMsg,
+								$author$project$Pages$DailyList$view(daily.a))
+							]);
+					case 'PlanPage':
+						var plan = _v0.a;
+						return _List_fromArray(
+							[
+								A2(
+								$elm$html$Html$map,
+								$author$project$Main$PlanMsg,
+								$author$project$Pages$PlanList$view(plan.a))
+							]);
+					default:
+						return _List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$classList(
+										_List_fromArray(
+											[
+												_Utils_Tuple2('error', true)
+											]))
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('404 Not found')
+									])),
+								A2(
+								$elm$html$Html$a,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$classList(
+										_List_fromArray(
+											[
+												_Utils_Tuple2('btnReturn', true)
+											])),
+										$elm$html$Html$Attributes$href('/')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Return home')
+									]))
+							]);
+				}
+			}()),
 		title: 'URL Interceptor'
 	};
 };

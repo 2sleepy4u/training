@@ -50,7 +50,7 @@ CREATE TABLE ExercisePlan (
     minutes INT,
 
     weekday Weekday[7],
-    active BOOLEAN,
+    active BOOLEAN NOT NULL,
     UNIQUE (name, active, id_user),
     CONSTRAINT fk_id_user_exercise_plan
         FOREIGN KEY(id_user)

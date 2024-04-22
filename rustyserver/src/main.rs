@@ -61,6 +61,7 @@ fn rocket() -> _ {
                insert_plan,
                insert_execution,
                get_daily,
+               get_plan_list,
                file_serve 
         ])
         .register("/", catchers![unauthorized])

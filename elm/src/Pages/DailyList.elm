@@ -154,7 +154,6 @@ view model =
           [ h2 [ classList [ ("title", True ) ] ] [ text daily.weekday ]
           , div [ classList [ ("dailyContainer", True ) ] ]
             (List.map exerciseElement daily.exercises)
-          , button [ classList [ ("fabs", True) ], onClick AddPlan ] [ text "+" ]
           ]
     ExecutionDetail detail ->
           div [ classList [ ("detailContainer", True) ] ]

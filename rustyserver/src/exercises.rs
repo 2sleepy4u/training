@@ -94,13 +94,13 @@ pub async fn get_daily(
     }
 }
 
-#[post("/get_plan_list", format = "json")]
+#[get("/get_plan_list", format = "json")]
 pub async fn get_plan_list(
     auth: isAuth,
     mut db: Connection<Training>
 ) -> Result<Json<Vec<Plan>>, Status> {
     let result = sqlx::query_as::<_, Plan>(GET_LIST)
-        .bind(&auth.ssid)
+        .bind(&auth.id_user)
         .fetch_all(&mut **db)
         .await;
 
@@ -207,8 +207,8 @@ pub async fn insert_execution (
 
 pub const INSERT_PLAN: &str = "
     INSERT INTO ExercisePlan 
-    (id_user, name, description, min_sets, max_sets, min_reps, max_reps, min_weight, weight_step, weekday) VALUES
-    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::Weekday[])
+    (id_user, name, description, min_reps, max_reps, min_sets, max_sets, min_weight, weight_step, weekday, active) VALUES
+    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::Weekday[], True)
 ";
 pub const UPDATE_PLAN: &str = "
     UPDATE ExercisePlan 
@@ -282,6 +282,22 @@ pub const INSERT_EXECUTION_ROW: &str = "
 ";
 
 pub const GET_LIST: &str = "
+    SELECT 
+        id_exercise_plan AS id_plan,
+        name,
+        description,
+        min_reps,
+        max_reps,
+        min_sets,
+        max_sets,
+        min_weight,
+        weight_step,
+        weekday::TEXT[],
+        active
+    FROM
+        ExercisePlan
+    WHERE
+        id_user = $1
 ";
 pub const INSERT_EXECUTION: &str = "
     INSERT INTO ExerciseExecution 

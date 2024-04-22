@@ -1,5 +1,5 @@
 module Types exposing (..)
-import Json.Decode as JD exposing (field, Decoder, int, string, list, bool, succeed)
+import Json.Decode as JD exposing (field, Decoder, int, string, list, bool, succeed, null)
 import Json.Decode.Pipeline exposing (required, optional)
 import Json.Encode as JE 
 
@@ -17,7 +17,7 @@ type alias ExercisePlan =
   , max_reps: Int
   , min_sets: Int
   , max_sets: Int
-  , weight: Int
+  , min_weight: Int
   , weight_step: Int
   , active: Bool
   }
@@ -45,10 +45,32 @@ encodePlan plan =
         , ( "max_reps", JE.int plan.max_reps )
         , ( "min_sets", JE.int plan.min_sets )
         , ( "max_sets", JE.int plan.max_sets )
-        , ( "min_weight", JE.int plan.weight )
+        , ( "min_weight", JE.int plan.min_weight )
         , ( "weight_step", JE.int plan.weight_step )
         , ( "active", JE.bool plan.active )
         ]
+
+planListDecoder : Decoder (List ExercisePlan) 
+planListDecoder =
+  JD.list planDecoder
+
+planDecoder : Decoder ExercisePlan 
+planDecoder =
+    JD.succeed ExercisePlan
+        |> required "id_plan" (JD.maybe int)
+        |> required "name" string
+        |> required "description" string
+        |> required "weekday" (list string)
+        |> required "min_reps" int
+        |> required "max_reps" int
+        |> required "min_sets" int
+        |> required "max_sets" int
+        |> required "min_weight" int
+        |> required "weight_step" int
+        |> required "active" bool
+
+
+
 
 exerciseDecoder : Decoder Exercise
 exerciseDecoder =

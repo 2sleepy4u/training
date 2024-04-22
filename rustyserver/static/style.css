@@ -92,6 +92,8 @@ html, body {
     border-radius: 15px;
     color:inherit;
     background-color: inherit;
+    display: block;
+    margin:auto;
 
     margin-top: 20%;
 }
@@ -224,4 +226,31 @@ html, body {
 
 .weekdays * {
     display: inline;
+}
+
+label {
+  left: 10px;
+  position: absolute;
+}
+
+
+input:focus + label {
+  font-size: x-small;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+#bottomNav {
+    position: absolute;
+    bottom: 0;
+    width: 97%;
+    text-align: center;
+    display: flex;
+    border-top: 1px solid;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+#bottomNav a {
+    flex: 1 1;
+    color: inherit;
 }
